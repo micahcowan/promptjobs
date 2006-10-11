@@ -1,0 +1,7 @@
+Idioms for protecting escape sequences:
+    bash:   '\[...\]'
+    zsh:    '%{...%}'
+    ksh:    (unnecessary: smart counting)
+
+ksh88 may not support command substitution... perhaps a workaround can be made
+to work /within/ parameter expansion?
