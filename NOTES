@@ -5,3 +5,8 @@ Idioms for protecting escape sequences:
 
 ksh88 may not support command substitution... perhaps a workaround can be made
 to work /within/ parameter expansion?
+
+Apparently, some terminal types have "status lines". Consider using status
+lines for the job lists when they are available.
+
+Consider supporting fallback on setf if setaf is unavailable.
