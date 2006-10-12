@@ -1,3 +1,55 @@
+USE CASES
+
+A user has an ANSI color-capable terminal, and wants job information to appear
+at the prompt in his Bourne-style shell. The user may achieve this by sourcing
+the prompt-jobs script, which initializes settings to their defaults, and adds
+colored job information to the command prompt.
+
+A user wishes to keep their existing prompt, but add job information to it.
+The user need only source the prompt-jobs script, which will determine an
+intelligent prompt based on the current prompt setting.
+
+A user is using a "dumb" terminal that doesn't support control sequences, but
+still wants prompt-jobs. The prompt-jobs code should detect this condition and
+print job information in the prompt without the use of terminal color codes.
+
+A user is using a terminal that supports color codes, but a shell that isn't
+capable of dealing with escape-sequences within the prompt. The prompt-jobs
+code should detect this condition and print the job information on a line
+preceding the rest of the job prompt (and not colorize that remainder).
+
+A user wishes to change the colors or other settings from their defaults. The
+user may source a prompt-jobs-config script that runs an interactive
+configuration editor, allowing the user to tweak various settings, and
+providing the option to save them persistently. Upon completion, these settings
+should take effect immediately in the current shell instance.
+
+A user has changed the prompt-jobs settings from their defaults in one shell,
+and wishes for them to be reflected in the current shell. The prompt command
+should automatically detect such changes, and update the prompt accordingly.
+
+Due to the required disk accesses involved, the user does not wish the prompt
+command to automatically detect changes in the default settings. Using the
+prompt-jobs-config script, the user should be able to turn off such automatic
+checks.
+
+A user wishes to restore his prompt to what it was before the prompt-jobs
+script was run. The user should be able to invoke a command that does this.
+
+Rather than include job information in the prompt proper, the user wishes to
+display job information on a status line.
+
+A user wishes jobs that start with a common word, such as "vim" or "pico", to
+be listed by the /argument/ to that command, rather than the command name
+itself. Perhaps in a slightly different color than usual, or something. This
+should be configurable via prompt-jobs-config.
+
+A user wishes jobs for commands beginning with "sudo" be colored specially to
+indicate the elevated privileges. Prompt-jobs-config should enable this
+behavior.
+
+DEVELOPMENT NOTES
+
 Idioms for protecting escape sequences:
     bash:   '\[...\]'
     zsh:    '%{...%}'
