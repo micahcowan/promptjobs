@@ -1,9 +1,9 @@
-# prompt-jobs.sh    written by Micah Cowan
+# prompt-jobs.sh    written by Micah J Cowan <micah@cowan.name>
 
 # NOTE: this script is not intended to be executed (e.g., by "sh prompt-jobs.sh");
 # rather, it is intended to be sourced directly into the currently running
 # interactive shell (e.g., by ". prompt-jobs.sh").
-
+# 
 # This script automatically adjusts the shell prompt to include abbreviated
 # information about currently stopped jobs (jobs that have been suspended to
 # the background), within the prompt itself. It is designed to be safe to use
@@ -12,9 +12,15 @@
 # substitutions within the PS1 shell variable (which is not required by SUSv3).
 # This includes bash, zsh, ash, dash, and ksh (public domain and '93, but /not/
 # 88).
-
+# 
 # The settings used to create the prompt string may be configured by running or
 # sourcing the prompt-jobs-config.sh script.
-
+# 
 # This script assumes that it can write/overwrite to all shell variables whose
 # names begin with PJOBS_ .
+
+# Copyright (C) 2006  Micah J Cowan <micah@cowan.name>
+# 
+# Redistribution of this program in any form, with or without
+# modifications, is permitted, provided that the above copyright is
+# retained in distributions of this program in source form.
