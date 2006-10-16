@@ -43,7 +43,7 @@ pjtest_execute()
 
 pjtest_no_path()
 {
-    PJTEST_RESULT="$( set +x ;PJOBS_AWK_PATH=/usr/bloop/bin/foo . "$PJOBS_SCRIPT" 2>&1)"
+    PJTEST_RESULT="$( set +x; PJOBS_AWK_PATH=/usr/bloop/bin/foo . "$PJOBS_SCRIPT" 2>&1)"
     PJTEST_STATUS=$?
     pjtest_assert $LINENO echo '"$PJTEST_RESULT"' \| \
         grep '"^ERROR: Can'\''t find awk"'
