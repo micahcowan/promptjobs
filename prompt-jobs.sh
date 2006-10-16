@@ -17,10 +17,46 @@
 # sourcing the prompt-jobs-config.sh script.
 # 
 # This script assumes that it can write/overwrite to all shell variables whose
-# names begin with PJOBS_ .
+# names begin with PJOBS_ or pjobs_ .
 
 # Copyright (C) 2006  Micah J Cowan <micah@cowan.name>
 # 
 # Redistribution of this program in any form, with or without
 # modifications, is permitted, provided that the above copyright is
 # retained in distributions of this program in source form.
+
+### Utility functions
+
+pjobs_warn()
+{
+    PJOBS_FORMAT="$1\n"
+    shift
+    printf "$PJOBS_FORMAT" "$@" >&2
+}
+
+### Try to detect our environment
+
+#   Was this script executed?
+if [ "$(basename "$0")" = prompt-jobs.sh ]
+then
+    pjobs_warn "ERROR: this script should not be executed directly. Source it instead."
+    exit 1
+fi
+
+#   Do we have awk?
+PJOBS_AWK_PATH="$(command -v awk 2>/dev/null)"
+if [ -z "$PJOBS_AWK_PATH" ]
+then
+    #   No awk.
+    pjobs_warn "ERROR: Can't find awk! Please make sure that awk is in your path."
+    return 127
+fi
+
+#   Do we have tput?
+
+#   Do we have color?
+
+### Cleanup definitions
+
+unset pjobs_warn
+unset PJOBS_FORMAT
