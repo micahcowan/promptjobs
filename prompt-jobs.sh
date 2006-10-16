@@ -44,8 +44,8 @@ then
 fi
 
 #   Do we have awk?
-PJOBS_AWK_PATH="$(command -v awk 2>/dev/null)"
-if [ -z "$PJOBS_AWK_PATH" ]
+PJOBS_AWK_PATH="${PJOBS_AWK_PATH:-$(command -v awk 2>/dev/null)}"
+if [ ! -x "$PJOBS_AWK_PATH" ]
 then
     #   No awk.
     pjobs_warn "ERROR: Can't find awk! Please make sure that awk is in your path."
