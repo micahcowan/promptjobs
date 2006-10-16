@@ -44,7 +44,7 @@ then
 fi
 
 #   Do we have awk?
-PJOBS_AWK_PATH="${PJOBS_AWK_PATH:-$(command -v awk 2>/dev/null)}"
+: ${PJOBS_AWK_PATH:=$(command -v awk 2>/dev/null)}
 if [ ! -x "$PJOBS_AWK_PATH" ]
 then
     #   No awk.
