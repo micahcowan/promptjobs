@@ -39,7 +39,7 @@ pjobs_warn()
 #   Was this script executed?
 if [ "$(basename "$0")" = prompt-jobs.sh ]
 then
-    pjobs_warn "ERROR: this script should not be executed directly. Source it instead."
+    pjobs_warn "ERROR: This script should not be executed directly. Source it instead."
     exit 1
 fi
 
