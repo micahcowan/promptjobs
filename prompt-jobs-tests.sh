@@ -18,7 +18,7 @@ PJTEST_SUCCEEDED=0
 
 ### Test facilities
 
-pjtest_assert()
+assert()
 {
     PJTEST_LINE=$1
     shift
@@ -30,24 +30,30 @@ pjtest_assert()
     fi
 }
 
+#   Quotemeta function
+qm()
+{
+    echo "$1" | sed "s/'/'\\\\''/g; s/^\\|\$/'/g"
+}
+
 ### Unit test functions
 
 pjtest_execute()
 {
     PJTEST_RESULT="$(sh "$PJOBS_SCRIPT" 2>&1 >/dev/null)"
     PJTEST_STATUS=$?
-    pjtest_assert $LINENO echo '"$PJTEST_RESULT"' \| \
-        grep "'^ERROR: This script should not'"
-    pjtest_assert $LINENO [ $PJTEST_STATUS -ne 0 ]
+    assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
+        grep $(qm "^ERROR: This script should not")
+    assert $LINENO [ $PJTEST_STATUS -ne 0 ]
 }
 
 pjtest_no_path()
 {
     PJTEST_RESULT="$( set +x; PJOBS_AWK_PATH=/usr/bloop/bin/foo . "$PJOBS_SCRIPT" 2>&1)"
     PJTEST_STATUS=$?
-    pjtest_assert $LINENO echo '"$PJTEST_RESULT"' \| \
-        grep '"^ERROR: Can'\''t find awk"'
-    pjtest_assert $LINENO [ $PJTEST_STATUS -eq 127 ]
+    assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
+        grep $(qm "^ERROR: Can't find awk")
+    assert $LINENO [ $PJTEST_STATUS -eq 127 ]
 }
 
 ### Run tests
