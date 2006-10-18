@@ -3,7 +3,6 @@
 # Test suite for prompt-jobs.sh. Execute this script, DO NOT SOURCE
 
 # dash has a bug in arithmetic expansions that causes this program to fail execution.
-
 # Copyright (C) 2006  Micah J Cowan <micah@cowan.name>
 # 
 # Redistribution of this program in any form, with or without
@@ -13,7 +12,7 @@
 ### Default settings
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
-: ${PJTEST_TESTS=execute no_path}
+: ${PJTEST_TESTS=execute no_awk}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
 PJTEST_SUCCEEDED=0
@@ -56,9 +55,9 @@ pjtest_execute()
     assert $LINENO [ $PJTEST_STATUS -ne 0 ]
 }
 
-pjtest_no_path()
+pjtest_no_awk()
 {
-    PJTEST_RESULT="$( set +x; PJOBS_AWK_PATH=/usr/bloop/bin/foo . "$PJOBS_SCRIPT" 2>&1)"
+    PJTEST_RESULT="$( set +x; PATH=bin0 . "$PJOBS_SCRIPT" 2>&1)"
     PJTEST_STATUS=$?
     assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
         grep $(qm "^ERROR: Can't find awk")
