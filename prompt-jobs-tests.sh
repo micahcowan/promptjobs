@@ -12,7 +12,7 @@
 ### Default settings
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
-: ${PJTEST_TESTS=execute no_awk}
+: ${PJTEST_TESTS=execute no_awk no_tput}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
 PJTEST_SUCCEEDED=0
