@@ -2,6 +2,8 @@
 
 # Test suite for prompt-jobs.sh. Execute this script, DO NOT SOURCE
 
+# dash has a bug in arithmetic expansions that causes this program to fail execution.
+
 # Copyright (C) 2006  Micah J Cowan <micah@cowan.name>
 # 
 # Redistribution of this program in any form, with or without
@@ -10,11 +12,18 @@
 
 ### Default settings
 
-: ${PJOBS_SCRIPT:=prompt-jobs.sh}
+: ${PJOBS_SCRIPT:=./prompt-jobs.sh}
 : ${PJTEST_TESTS=execute no_path}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
 PJTEST_SUCCEEDED=0
+
+#   Zsh needs some tweaks.
+if [ "$ZSH_NAME" ]
+then
+    set -y
+    unsetopt Function_ArgZero
+fi
 
 ### Test facilities
 

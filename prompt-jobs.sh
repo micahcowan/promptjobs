@@ -40,7 +40,13 @@ pjobs_warn()
 if [ "$(basename "$0")" = prompt-jobs.sh ]
 then
     pjobs_warn "ERROR: This script should not be executed directly. Source it instead."
-    exit 1
+    if [ "$ZSH_NAME" ]
+    then
+        pjobs_warn "Please run 'unsetopt Function_ArgZero' in zsh before sourcing this script."
+        return 1
+    else
+        exit 1
+    fi
 fi
 
 #   Do we have awk?
