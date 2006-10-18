@@ -62,8 +62,8 @@ fi
 : ${PJOBS_TPUT_PATH:=$(command -v tput 2>/dev/null)}
 if [ ! -x "$PJOBS_TPUT_PATH" ]
 then
-    #   No awk.
-    pjobs_warn "ERROR: Can't find tput! Please make sure that awk is in your path."
+    #   No tput.
+    pjobs_warn "ERROR: Can't find tput! Please make sure that tput is in your path."
     return 127
 fi
 
