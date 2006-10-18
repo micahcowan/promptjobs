@@ -57,10 +57,19 @@ pjtest_execute()
 
 pjtest_no_awk()
 {
-    PJTEST_RESULT="$( set +x; PATH=bin0 . "$PJOBS_SCRIPT" 2>&1)"
+    PJTEST_RESULT="$( set +x; PATH=bin-no-awk . "$PJOBS_SCRIPT" 2>&1)"
     PJTEST_STATUS=$?
     assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
         grep $(qm "^ERROR: Can't find awk")
+    assert $LINENO [ $PJTEST_STATUS -eq 127 ]
+}
+
+pjtest_no_tput()
+{
+    PJTEST_RESULT="$( set +x; PATH=bin-no-tput . "$PJOBS_SCRIPT" 2>&1)"
+    PJTEST_STATUS=$?
+    assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
+        grep $(qm "^ERROR: Can't find tput")
     assert $LINENO [ $PJTEST_STATUS -eq 127 ]
 }
 
