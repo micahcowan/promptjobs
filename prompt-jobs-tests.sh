@@ -12,7 +12,8 @@
 ### Default settings
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
-: ${PJTEST_TESTS=execute no_awk no_tput}
+: ${PJTEST_TESTS:=execute no_awk no_tput nocolor_empty_prompt nocolor_prompt}
+: ${PJTEST_SHELL:=${SHELL?:-sh}}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
 PJTEST_SUCCEEDED=0
@@ -41,7 +42,40 @@ assert()
 #   Quotemeta function
 qm()
 {
-    echo "$1" | sed "s/'/'\\\\''/g; s/^\\|\$/'/g"
+    echo "$1" | sed "s/'/'\\\\''/g; s/^/'/g; s/\$/'/g;"
+}
+
+#   Generate fake "jobs" output.
+fake_jobs()
+{
+    job_i=1
+    job_c='+'
+    while read job
+    do
+        printf '[%d] %s %23s %s\n' $job_i $job_c 'Stopped' "$job"
+        : $((job_i+=1))
+        if [ $job_c = '+' ]; then job_c='-'; else job_c=' '; fi
+    done
+}
+
+#   Get a prompt.
+#       1: value for PS1, prior to running prompt-jobs.sh
+#       2: terminal type
+#       3..: commands to run
+get_prompt()
+{
+    NEW_PS1="$1"
+    shift
+    NEW_TERM="$1"
+    shift
+    (
+        exec 2>&1
+        PATH="bin-test:$PATH"
+        PS1="$NEW_PS1"
+        TERM="$NEW_TERM"
+        for cmd in "$@"; do echo "$cmd"; done | fake_jobs | \
+            ( . "$PJOBS_SCRIPT" ; pjobs_gen_prompt )
+    )
 }
 
 ### Unit test functions
@@ -73,6 +107,18 @@ pjtest_no_tput()
     assert $LINENO [ $PJTEST_STATUS -eq 127 ]
 }
 
+pjtest_nocolor_empty_prompt()
+{
+    PJTEST_PROMPT=$(get_prompt '$ ' dumb)
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '$ ') ]"
+}
+
+pjtest_nocolor_prompt()
+{
+    PJTEST_PROMPT=$(get_prompt '$ ' dumb 'cat' 'ls | less')
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:cat 2:ls)$ ') ]"
+}
+
 ### Run tests
 
 for PJTEST_TEST in $PJTEST_TESTS
@@ -95,11 +141,11 @@ then
 fi
 
 echo
+echo "Total tests run: $PJTEST_TOTAL_RUN"
+echo "Succeeded      : $PJTEST_SUCCEEDED"
 tput setaf $PJTEST_RESULT_COLOR
 tput bold
-echo "Total tests run: $PJTEST_TOTAL_RUN"
-echo "Failed tests:    $PJTEST_FAILED"
-echo "Succeeded   :    $PJTEST_SUCCEEDED"
+echo "Failed tests   : $PJTEST_FAILED"
 tput sgr0
 
 exit $PJTEST_FAILED
