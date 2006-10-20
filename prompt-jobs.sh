@@ -34,6 +34,68 @@ pjobs_warn()
     printf "$PJOBS_FORMAT" "$@" >&2
 }
 
+pjobs_gen_joblist()
+{
+    awk -v PJOBS_PRE_LIST_STR="$PJOBS_PRE_LIST_STR" \
+        -v PJOBS_POST_LIST_STR="$PJOBS_POST_LIST_STR" '
+BEGIN {
+    started=0;
+}
+
+{
+    rol = $0;
+
+    # Find job id
+    if (!match(rol, "^[[:space:]]*[[][[:space:]]*[[:digit:]]+[]]"))
+        next;
+    
+    job_id = substr(rol, 1, RLENGTH);
+    rol = substr(rol, 1+RLENGTH);
+
+    # Pare job id down to number
+    match(job_id, "[[:digit:]]+");
+    job_id = substr(job_id, 1, RLENGTH);
+
+    # Find status (and require it to be "Stopped" or "Suspended")
+    if (!match(rol, "^[[:space:]]*(Stopped|Suspended)[[:space:]]*\\(SIG[^)]+\\)"))
+        next;
+    rol = substr(rol, 1+RLENGTH);
+
+    # Get first word
+    if (!match(rol, "[^[:space:]]+"))
+        next;
+    cmdname = substr(rol, RSTART, RLENGTH);
+
+    if (!started) {
+        printf("%s", PJOBS_PRE_LIST_STR);
+        started=1
+    } else {
+        printf(" ");
+    }
+
+    printf("%d:%s", job_id, cmdname);
+}
+
+END {
+    if (started) {
+        printf("%s", PJOBS_POST_LIST_STR);
+    }
+}
+
+### Functions
+
+function print_job()
+{
+}
+'
+}
+
+pjobs_gen_prompt()
+{
+    pjobs_gen_joblist
+    printf '%s' "$PJOBS_ORIG_PS1"
+}
+
 ### Try to detect our environment
 
 #   Was this script executed?
@@ -68,6 +130,13 @@ then
 fi
 
 #   Do we have color?
+
+### Guess workable defaults for config variables.
+
+#   What is the current value of PS1?
+: ${PJOBS_ORIG_PS1:=$PS1}
+: ${PJOBS_PRE_LIST_STR='('}
+: ${PJOBS_POST_LIST_STR=')'}
 
 ### Cleanup definitions
 
