@@ -46,7 +46,7 @@ BEGIN {
     rol = $0;
 
     # Find job id
-    if (!match(rol, "^[[:space:]]*[[][[:space:]]*[[:digit:]]+[]]"))
+    if (!match(rol, "^[[:space:]]*[[][[:space:]]*[[:digit:]]+[]]([[:space:]]*[+-])?"))
         next;
     
     job_id = substr(rol, 1, RLENGTH);
@@ -54,10 +54,10 @@ BEGIN {
 
     # Pare job id down to number
     match(job_id, "[[:digit:]]+");
-    job_id = substr(job_id, 1, RLENGTH);
+    job_id = substr(job_id, RSTART, RLENGTH);
 
     # Find status (and require it to be "Stopped" or "Suspended")
-    if (!match(rol, "^[[:space:]]*(Stopped|Suspended)[[:space:]]*\\(SIG[^)]+\\)"))
+    if (!match(rol, "^[[:space:]]*(Stopped|Suspended)[[:space:]]*(\\(SIG[^)]+\\))?"))
         next;
     rol = substr(rol, 1+RLENGTH);
 
@@ -80,12 +80,6 @@ END {
     if (started) {
         printf("%s", PJOBS_POST_LIST_STR);
     }
-}
-
-### Functions
-
-function print_job()
-{
 }
 '
 }
