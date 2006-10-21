@@ -106,7 +106,7 @@ then
 fi
 
 #   Do we have awk?
-: ${PJOBS_AWK_PATH:=$(command -v awk 2>/dev/null)}
+: ${PJOBS_AWK_PATH:="$(command -v awk 2>/dev/null)"}
 if [ ! -x "$PJOBS_AWK_PATH" ]
 then
     #   No awk.
@@ -115,7 +115,7 @@ then
 fi
 
 #   Do we have tput?
-: ${PJOBS_TPUT_PATH:=$(command -v tput 2>/dev/null)}
+: ${PJOBS_TPUT_PATH:="$(command -v tput 2>/dev/null)"}
 if [ ! -x "$PJOBS_TPUT_PATH" ]
 then
     #   No tput.
@@ -128,7 +128,7 @@ fi
 ### Guess workable defaults for config variables.
 
 #   What is the current value of PS1?
-: ${PJOBS_ORIG_PS1:=$PS1}
+: ${PJOBS_ORIG_PS1:="$PS1"}
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
 
