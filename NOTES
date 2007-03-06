@@ -55,6 +55,9 @@ Idioms for protecting escape sequences:
     zsh:    '%{...%}'
     ksh:    (unnecessary: smart counting)
 
+These protection escapes can /not/ come from an expansion, but must
+exist literally within PS1 (at least, this is the case for bash.)
+
 ksh88 may not support command substitution... perhaps a workaround can be made
 to work /within/ parameter expansion?
 
