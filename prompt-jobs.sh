@@ -57,7 +57,7 @@ BEGIN {
     job_id = substr(job_id, RSTART, RLENGTH);
 
     # Find status (and require it to be "Stopped" or "Suspended")
-    if (!match(rol, "^[[:space:]]*(Stopped|Suspended)[[:space:]]*(\\(SIG[^)]+\\))?"))
+    if (!match(rol, "^[[:space:]]*([Ss]topped|[Ss]uspended)[[:space:]]*(\\(SIG[^)]+\\))?"))
         next;
     rol = substr(rol, 1+RLENGTH);
 
