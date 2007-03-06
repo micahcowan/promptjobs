@@ -55,8 +55,14 @@ Idioms for protecting escape sequences:
     zsh:    '%{...%}'
     ksh:    (unnecessary: smart counting)
 
-These protection escapes can /not/ come from an expansion, but must
-exist literally within PS1 (at least, this is the case for bash.)
+In bash, hese protection escapes can /not/ come from an expansion, but
+must exist literally within PS1. Not a problem for ksh, which doesn't
+use these. Zsh will interpret these after interpolation. Bash can
+work-around using PROMPT_JOBS.
+
+Zsh requires the following options to be set/unset in order to work:
+  setopt prompt_subst
+  unsetopt function_argzero
 
 ksh88 may not support command substitution... perhaps a workaround can be made
 to work /within/ parameter expansion?
