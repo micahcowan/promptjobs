@@ -42,7 +42,7 @@ assert()
 #   Quotemeta function
 qm()
 {
-    echo "$1" | sed "s/'/'\\\\''/g; s/^/'/g; s/\$/'/g;"
+    echo "$1" | sed "s/'/'\\\\''/g; s/^/'/g; s/\$/'/g; s//\\\\033/g;"
 }
 
 #   Generate fake "jobs" output.
@@ -121,10 +121,16 @@ pjtest_nocolor_prompt()
 
 pjtest_color_prompt()
 {
+    PJOBS_BASE_BOLD=0   # signal prompt-jobs to use normal intensity for base
+                        # color.
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
     # TODO: make this test consider non-bash shells.
+    BSQ='\[[0;10m[34m\]'
+    NSQ='\[[1m[31m\]'
+    JSQ='\[[1m[33m\]'
+    CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm '\[[34m[1m\](\[[31m\]1\[[1;33\]cat\[[1;34m\]|[1;31m\]2\[[1;33\]ls\[[1;34m\])$ \[[0m\]') ]"
+                        "$(qm "${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
 ### Run tests
