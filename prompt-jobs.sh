@@ -107,13 +107,13 @@ pjobs_gen_prompt()
 pjobs_gen_seq()
 {
     printf '%s' "$PJOBS_SEQ_PROTECT_START"
-    printf '%s' "$("$PJOBS_TPUT_PATH" setaf "$1")"
     if [ "$2" -eq 1 ]
     then
         "$PJOBS_TPUT_PATH" bold
     else
         "$PJOBS_TPUT_PATH" sgr0
     fi
+    "$("$PJOBS_TPUT_PATH" setaf "$1"
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
 
@@ -155,13 +155,18 @@ fi
 "$PJOBS_TPUT_PATH" setaf 1 >/dev/null
 if [ $? -eq 0 ]
 then
-    PJOBS_HAVE_COLOR=1
+    PJOBS_HAVE_COLOR=y
 else
-    PJOBS_HAVE_COLOR=0
+    PJOBS_HAVE_COLOR=n
 fi
 
-if [ "$PJOBS_HAVE_COLOR" -ne 0 ]
+if [ "$PJOBS_HAVE_COLOR" = y ]
 then
+    # Figure out terminal-protecting sequences.
+    # XXX: currently bash-specific.
+    PJOBS_SEQ_PROTECT_START='\['
+    PJOBS_SEQ_PROTECT_END='\]'
+    
     : ${PJOBS_BASE_COLOR:=4}    # blue
     : ${PJOBS_BASE_BOLD:=1}     # bright
     : ${PJOBS_NUM_COLOR:=1}     # red
@@ -176,12 +181,8 @@ then
     do
         eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "$'"PJOBS_${x}_COLOR"'" "$'"PJOBS_${x}_BOLD"'")'
     done
-    PJOBS_CLEAR_SEQ="$("$PJOBS_TPUT_PATH" sgr0)"
 
-    # Figure out terminal-protecting sequences.
-    # XXX: currently bash-specific.
-    PJOBS_SEQ_PROTECT_START='\['
-    PJOBS_SEQ_PROTECT_END='\]'
+    PJOBS_CLEAR_SEQ="${PJOBS_SEQ_PROTECT_START}$("$PJOBS_TPUT_PATH" sgr0)${PJOBS_SEQ_PROTECT_END}"
 fi
 
 ### Guess workable defaults for config variables.

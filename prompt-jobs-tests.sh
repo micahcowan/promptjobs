@@ -124,7 +124,7 @@ pjtest_color_prompt()
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
     # TODO: make this test consider non-bash shells.
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm '\[[1;34m\](\[[1;31m\]1\[[1;33\]cat\[[1;34m\]|[1;31m\]2\[[1;33\]ls\[[1;34m\])$ \[[0m\]') ]"
+                        "$(qm '\[[34m[1m\](\[[31m\]1\[[1;33\]cat\[[1;34m\]|[1;31m\]2\[[1;33\]ls\[[1;34m\])$ \[[0m\]') ]"
 }
 
 ### Run tests
