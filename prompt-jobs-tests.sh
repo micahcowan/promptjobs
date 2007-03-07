@@ -153,7 +153,7 @@ pjtest_special_chars()
     # Ensure that we use basenames, and don't allow escapes in the
     # output. TODO: zsh uses % for escapes, rather than backslash.
     PJTEST_PROMPT="$(get_prompt '$ ' dumb '/bin/echo' '\\ls')"
-    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = '(1:echo 2:ls)$ ' ]
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:echo 2:ls)$ ')" ]
 }
 
 ### Run tests
