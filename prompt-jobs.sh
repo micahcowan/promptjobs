@@ -124,6 +124,20 @@ then
 fi
 
 #   Do we have color?
+: ${PJOBS_BASE_COLOR:=4}    # blue
+: ${PJOBS_BASE_BOLD:=1}     # bright
+: ${PJOBS_NUM_COLOR:=1}     # red
+: ${PJOBS_NUM_BOLD:=1}      # bright
+: ${PJOBS_JOB_COLOR:=3}     # yellow
+: ${PJOBS_JOB_BOLD:=1}      # bright
+: ${PJOBS_SEP_COLOR:="$PJOBS_BASE_COLOR"}
+: ${PJOBS_SEP_BOLD:="$PJOBS_BASE_BOLD"}
+
+# Generate coloring sequences: $PJOBS_BASE_SEQ, $PJOBS_NUM_SEQ, etc.
+for x in BASE NUM JOB SEP
+do
+    eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "'"$PJOBS_${x}_COLOR"'" "'"$PJOBS_${x}_BOLD"'")'
+done
 
 ### Guess workable defaults for config variables.
 
