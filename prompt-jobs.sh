@@ -34,10 +34,22 @@ pjobs_warn()
     printf "$PJOBS_FORMAT" "$@" >&2
 }
 
+# Escape backslashes for awk.
+pjobs_esc()
+{
+    echo "$1" | sed 's/\\/\\\\/g'
+}
+
 pjobs_gen_joblist()
 {
-    "${PJOBS_AWK_PATH}" -v PJOBS_PRE_LIST_STR="$PJOBS_PRE_LIST_STR" \
-        -v PJOBS_POST_LIST_STR="$PJOBS_POST_LIST_STR" '
+    "${PJOBS_AWK_PATH}" -v PJOBS_PRE_LIST_STR="$(pjobs_esc "$PJOBS_PRE_LIST_STR")" \
+        -v PJOBS_MID_LIST_STR="$(pjobs_esc "$PJOBS_POST_LIST_STR")" \
+        -v PJOBS_IN_JOBS_STR="$(pjobs_esc "$PJOBS_IN_JOBS_STR")" \
+        -v PJOBS_POST_LIST_STR="$(pjobs_esc "$PJOBS_POST_LIST_STR")" \
+        -v PJOBS_CLEAR_SEQ="$(pjobs_esc "$PJOBS_CLEAR_SEQ")" \
+        -v PJOBS_BASE_SEQ="$(pjobs_esc "$PJOBS_BASE_SEQ")" -v PJOBS_NUM_SEQ="$(pjobs_esc "$PJOBS_NUM_SEQ")" \
+        -v PJOBS_JOB_SEQ="$(pjobs_esc "$PJOBS_JOB_SEQ")" -v PJOBS_SEP_SEQ="$(pjobs_esc "$PJOBS_SEP_SEQ")" \
+        '
 BEGIN {
     started=0;
 }
@@ -67,18 +79,18 @@ BEGIN {
     cmdname = substr(rol, RSTART, RLENGTH);
 
     if (!started) {
-        printf("%s", PJOBS_PRE_LIST_STR);
+        printf("%s", PJOBS_SEP_SEQ PJOBS_PRE_LIST_STR);
         started=1
     } else {
-        printf(" ");
+        printf("%s", PJOBS_SEP_SEQ PJOBS_MID_LIST_STR);
     }
 
-    printf("%d:%s", job_id, cmdname);
+    printf("%s%d%s", PJOBS_NUM_SEQ, job_id, PJOBS_IN_JOB_STR PJOBS_JOB_SEQ cmdname);
 }
 
 END {
     if (started) {
-        printf("%s", PJOBS_POST_LIST_STR);
+        printf("%s", PJOBS_BASE_SEQ PJOBS_POST_LIST_STR PJOBS_CLEAR_SEQ);
     }
 }
 '
@@ -87,7 +99,20 @@ END {
 pjobs_gen_prompt()
 {
     pjobs_gen_joblist
-    printf '%s' "$PJOBS_ORIG_PS1"
+    printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_ORIG_PS1}${PJOBS_CLEAR_SEQ}"
+}
+
+# Generate an escape sequence that will set a color/bold combo, given a
+# color number and bold (as boolean).
+pjobs_gen_seq()
+{
+    printf '%s' "$PJOBS_SEQ_PROTECT_START"
+    printf '%s' "$("$PJOBS_TPUT_PATH" setaf "$1")"
+    if [ "$2" -eq 1 ]
+    then
+        printf '%s' "$("$PJOBS_TPUT_PATH" bold)"
+    fi
+    printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
 
 ### Try to detect our environment
@@ -124,20 +149,38 @@ then
 fi
 
 #   Do we have color?
-: ${PJOBS_BASE_COLOR:=4}    # blue
-: ${PJOBS_BASE_BOLD:=1}     # bright
-: ${PJOBS_NUM_COLOR:=1}     # red
-: ${PJOBS_NUM_BOLD:=1}      # bright
-: ${PJOBS_JOB_COLOR:=3}     # yellow
-: ${PJOBS_JOB_BOLD:=1}      # bright
-: ${PJOBS_SEP_COLOR:="$PJOBS_BASE_COLOR"}
-: ${PJOBS_SEP_BOLD:="$PJOBS_BASE_BOLD"}
 
-# Generate coloring sequences: $PJOBS_BASE_SEQ, $PJOBS_NUM_SEQ, etc.
-for x in BASE NUM JOB SEP
-do
-    eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "'"$PJOBS_${x}_COLOR"'" "'"$PJOBS_${x}_BOLD"'")'
-done
+"$PJOBS_TPUT_PATH" setaf 1 >/dev/null
+if [ $? -eq 0 ]
+then
+    PJOBS_HAVE_COLOR=1
+else
+    PJOBS_HAVE_COLOR=0
+fi
+
+if [ "$PJOBS_HAVE_COLOR" -ne 0 ]
+then
+    : ${PJOBS_BASE_COLOR:=4}    # blue
+    : ${PJOBS_BASE_BOLD:=1}     # bright
+    : ${PJOBS_NUM_COLOR:=1}     # red
+    : ${PJOBS_NUM_BOLD:=1}      # bright
+    : ${PJOBS_JOB_COLOR:=3}     # yellow
+    : ${PJOBS_JOB_BOLD:=1}      # bright
+    : ${PJOBS_SEP_COLOR:="$PJOBS_BASE_COLOR"}
+    : ${PJOBS_SEP_BOLD:="$PJOBS_BASE_BOLD"}
+
+    # Generate coloring sequences: $PJOBS_BASE_SEQ, $PJOBS_NUM_SEQ, etc.
+    for x in BASE NUM JOB SEP
+    do
+        eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "$'"PJOBS_${x}_COLOR"'" "$'"PJOBS_${x}_BOLD"'")'
+    done
+    PJOBS_CLEAR_SEQ="$("$PJOBS_TPUT_PATH" sgr0)"
+
+    # Figure out terminal-protecting sequences.
+    # XXX: currently bash-specific.
+    PJOBS_SEQ_PROTECT_START='\['
+    PJOBS_SEQ_PROTECT_END='\]'
+fi
 
 ### Guess workable defaults for config variables.
 
@@ -145,6 +188,30 @@ done
 : ${PJOBS_ORIG_PS1:="$PS1"}
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
+
+# Define PJOBS_MID_LIST_STR; default differs depending on whether we have
+# color.
+if [ "$PJOBS_MID_LIST_STR" ]
+then
+    : # defined already. Do nothing.
+elif [ "$PJOBS_HAVE_COLOR" = 'y' ]
+then
+    PJOBS_MID_LIST_STR='|'
+else
+    PJOBS_MID_LIST_STR=' '
+fi
+
+# Define PJOBS_IN_JOBS_STR; default differs depending on whether we have
+# color.
+if [ "$PJOBS_IN_JOBS_STR" ]
+then
+    : # defined already. Do nothing.
+elif [ "$PJOBS_HAVE_COLOR" = 'y' ]
+then
+    PJOBS_IN_JOBS_STR=''
+else
+    PJOBS_IN_JOBS_STR=':'
+fi
 
 ### Cleanup definitions
 
