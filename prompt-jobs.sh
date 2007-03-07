@@ -49,6 +49,7 @@ pjobs_gen_joblist()
         -v PJOBS_CLEAR_SEQ="$(pjobs_esc "$PJOBS_CLEAR_SEQ")" \
         -v PJOBS_BASE_SEQ="$(pjobs_esc "$PJOBS_BASE_SEQ")" -v PJOBS_NUM_SEQ="$(pjobs_esc "$PJOBS_NUM_SEQ")" \
         -v PJOBS_JOB_SEQ="$(pjobs_esc "$PJOBS_JOB_SEQ")" -v PJOBS_SEP_SEQ="$(pjobs_esc "$PJOBS_SEP_SEQ")" \
+        -v PJOBS_ESCAPE_CHAR='\\' \
         '
 BEGIN {
     started=0;
@@ -77,6 +78,17 @@ BEGIN {
     if (!match(rol, "[^[:space:]]+"))
         next;
     cmdname = substr(rol, RSTART, RLENGTH);
+    # Get a basename version
+    if (match(cmdname, "[^/]*$"))
+        cmdname = substr(cmdname, RSTART, RLENGTH);
+    # Strip any escape characters
+    new_cmdname="";
+    for (i=1; i<=length(cmdname); ++i) {
+        c = substr(cmdname, i, 1);
+        if (c != PJOBS_ESCAPE_CHAR)
+            new_cmdname = new_cmdname c;
+    }
+    cmdname = new_cmdname
 
     if (!started) {
         printf("%s", PJOBS_SEP_SEQ PJOBS_PRE_LIST_STR);
