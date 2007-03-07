@@ -43,7 +43,7 @@ pjobs_esc()
 pjobs_gen_joblist()
 {
     "${PJOBS_AWK_PATH}" -v PJOBS_PRE_LIST_STR="$(pjobs_esc "$PJOBS_PRE_LIST_STR")" \
-        -v PJOBS_MID_LIST_STR="$(pjobs_esc "$PJOBS_POST_LIST_STR")" \
+        -v PJOBS_MID_LIST_STR="$(pjobs_esc "$PJOBS_MID_LIST_STR")" \
         -v PJOBS_IN_JOBS_STR="$(pjobs_esc "$PJOBS_IN_JOBS_STR")" \
         -v PJOBS_POST_LIST_STR="$(pjobs_esc "$PJOBS_POST_LIST_STR")" \
         -v PJOBS_CLEAR_SEQ="$(pjobs_esc "$PJOBS_CLEAR_SEQ")" \
@@ -85,7 +85,7 @@ BEGIN {
         printf("%s", PJOBS_SEP_SEQ PJOBS_MID_LIST_STR);
     }
 
-    printf("%s%d%s", PJOBS_NUM_SEQ, job_id, PJOBS_IN_JOB_STR PJOBS_JOB_SEQ cmdname);
+    printf("%s%d%s", PJOBS_NUM_SEQ, job_id, PJOBS_IN_JOBS_STR PJOBS_JOB_SEQ cmdname);
 }
 
 END {
@@ -110,7 +110,9 @@ pjobs_gen_seq()
     printf '%s' "$("$PJOBS_TPUT_PATH" setaf "$1")"
     if [ "$2" -eq 1 ]
     then
-        printf '%s' "$("$PJOBS_TPUT_PATH" bold)"
+        "$PJOBS_TPUT_PATH" bold
+    else
+        "$PJOBS_TPUT_PATH" sgr0
     fi
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
