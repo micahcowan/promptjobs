@@ -113,7 +113,7 @@ pjobs_gen_seq()
     else
         "$PJOBS_TPUT_PATH" sgr0
     fi
-    "$("$PJOBS_TPUT_PATH" setaf "$1"
+    "$PJOBS_TPUT_PATH" setaf "$1"
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
 
