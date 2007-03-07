@@ -12,7 +12,7 @@
 ### Default settings
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
-: ${PJTEST_TESTS:=execute no_awk no_tput nocolor_empty_prompt nocolor_prompt}
+: ${PJTEST_TESTS:=execute no_awk no_tput nocolor_empty_prompt nocolor_prompt color_prompt}
 : ${PJTEST_SHELL:=${SHELL?:-sh}}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
@@ -117,6 +117,14 @@ pjtest_nocolor_prompt()
 {
     PJTEST_PROMPT=$(get_prompt '$ ' dumb 'cat' 'ls | less')
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:cat 2:ls)$ ') ]"
+}
+
+pjtest_color_prompt()
+{
+    PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+    # TODO: make this test consider non-bash shells.
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
+                        "$(qm '\[[1;34m\](\[[1;31m\]1\[[1;33\]cat\[[1;34m\]|[1;31m\]2\[[1;33\]ls\[[1;34m\])$ \[[0m\]') ]"
 }
 
 ### Run tests
