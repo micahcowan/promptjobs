@@ -217,3 +217,6 @@ fi
 
 unset pjobs_warn
 unset PJOBS_FORMAT
+
+# XXX: bash-only:
+PROMPT_COMMAND='PS1="$(jobs | pjobs_gen_prompt)"'
