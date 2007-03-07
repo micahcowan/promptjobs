@@ -16,11 +16,22 @@
 export TERMINFO=./terminfo
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
-: ${PJTEST_TESTS:=execute no_awk no_tput nocolor_empty_prompt nocolor_prompt color_prompt}
 : ${PJTEST_SHELL:=${SHELL?:-sh}}
 PJTEST_TOTAL_RUN=0
 PJTEST_FAILED=0
 PJTEST_SUCCEEDED=0
+if [ ! "$PJTEST_TESTS" ]
+then
+    PJTEST_TESTS="
+        execute
+        no_awk
+        no_tput
+        nocolor_empty_prompt
+        nocolor_prompt
+        color_prompt
+        special_chars
+    "
+fi
 
 #   Zsh needs some tweaks.
 if [ "$ZSH_NAME" ]
@@ -135,6 +146,14 @@ pjtest_color_prompt()
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+}
+
+pjtest_special_chars()
+{
+    # Ensure that we use basenames, and don't allow escapes in the
+    # output. TODO: zsh uses % for escapes, rather than backslash.
+    PJTEST_PROMPT="$(get_prompt '$ ' dumb '/bin/echo' '\\ls')"
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = '(1:echo 2:ls)$ ' ]
 }
 
 ### Run tests
