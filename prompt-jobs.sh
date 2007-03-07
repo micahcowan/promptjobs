@@ -36,7 +36,7 @@ pjobs_warn()
 
 pjobs_gen_joblist()
 {
-    awk -v PJOBS_PRE_LIST_STR="$PJOBS_PRE_LIST_STR" \
+    "${PJOBS_AWK_PATH}" -v PJOBS_PRE_LIST_STR="$PJOBS_PRE_LIST_STR" \
         -v PJOBS_POST_LIST_STR="$PJOBS_POST_LIST_STR" '
 BEGIN {
     started=0;
