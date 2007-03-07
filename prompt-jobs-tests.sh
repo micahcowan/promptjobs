@@ -11,6 +11,10 @@
 
 ### Default settings
 
+# Ensure that the terminal escapes will match up exactly, so we can
+# do character-wise comparisons.
+export TERMINFO=./terminfo
+
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
 : ${PJTEST_TESTS:=execute no_awk no_tput nocolor_empty_prompt nocolor_prompt color_prompt}
 : ${PJTEST_SHELL:=${SHELL?:-sh}}
