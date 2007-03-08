@@ -222,6 +222,11 @@ pjtest_bash()
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+
+    # prompt-jobs.sh should set PROMPT_COMMAND for bash. It should also
+    # preserve previous contents of PROMPT_COMMAND.
+    PJTEST_RESULT=$( PROMPT_COMMAND='true'; . ./prompt-jobs.sh; echo "$PROMPT_COMMAND" )
+    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(jobs | pjobs_gen_prompt)"')" ]
 }
 
 pjtest_zsh()
