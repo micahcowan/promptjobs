@@ -33,7 +33,7 @@ then
         prompt_split
         root_colors
     "
-    if true
+    if false    # set this to true to disable shell-specific tests.
     then
         :
     elif [ "$BASH_VERSION" ]
@@ -157,7 +157,6 @@ pjtest_color_prompt()
     # (they'll be dealt with in the shell-specific tests).
     PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
 
-    # TODO: make this test consider non-bash shells.
     BSQ='[0;10m[34m'
     SSQ='[0;10m[35m'
     NSQ='[1m[31m'
@@ -169,7 +168,7 @@ pjtest_color_prompt()
 
 pjtest_special_chars() {
     # Ensure that we use basenames, and don't allow escapes in the
-    # output. TODO: zsh uses % for escapes, rather than backslash.
+    # output.
     PJTEST_PROMPT="$(get_prompt '$ ' dumb '/bin/echo' '\\ls')"
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:echo 2:ls)$ ')" ]
 }
@@ -203,7 +202,6 @@ pjtest_root_colors()
     # (they'll be dealt with in the shell-specific tests).
     PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
 
-    # TODO: make this test consider non-bash shells.
     BSQ='[0;10m[31m'
     NSQ='[0;10m[32m'
     JSQ='[1m[33m'
@@ -215,16 +213,27 @@ pjtest_root_colors()
 pjtest_bash()
 {
     # Ensure we use the proper escape-sequence protection for bash.
-    PJOBS_BASE_TPUT='sgr0; setaf 4'   # signal prompt-jobs to use normal
-                                      # intensity for base color.
-    PJOBS_SEP_TPUT='sgr0; setaf 5'    # to distinguish from the base color.
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
-    # TODO: make this test consider non-bash shells.
-    BSQ='\[[0;10m[34m\]'
-    SSQ='\[[0;10m[35m\]'
+
+    BSQ='\[[1m[34m\]'
+    SSQ=$BSQ
     NSQ='\[[1m[31m\]'
     JSQ='\[[1m[33m\]'
     CSQ='\[[0;10m\]'
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+}
+
+pjtest_zsh()
+{
+    # Ensure we use the proper escape-sequence protection for zsh.
+    PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+
+    BSQ='%{[1m[34m%}'
+    SSQ=$BSQ
+    NSQ='%{[1m[31m%}'
+    JSQ='%{[1m[33m%}'
+    CSQ='%{[0;10m%}'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
