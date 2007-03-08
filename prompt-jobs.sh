@@ -148,7 +148,7 @@ pjobs_get_list_loc()
 ### Try to detect our environment
 
 #   Was this script executed?
-if [ "$(basename "$0")" = prompt-jobs.sh ]
+if [ "$(basename -- "$0")" = prompt-jobs.sh ]
 then
     pjobs_warn "ERROR: This script should not be executed directly. Source it instead."
     if [ "$ZSH_NAME" ]
@@ -224,6 +224,7 @@ fi
 
 #   What is the current value of PS1?
 : ${PJOBS_ORIG_PS1:="$PS1"}
+: ${PJOBS_ORIG_PROMPT_COMMAND:="$PROMPT_COMMAND"}
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
 : ${PJOBS_BEFORE_LIST:="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
@@ -260,3 +261,7 @@ unset PJOBS_FORMAT
 
 # XXX: bash-only:
 PROMPT_COMMAND='PS1="$(jobs | pjobs_gen_prompt)"'
+if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
+then
+    PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
+fi
