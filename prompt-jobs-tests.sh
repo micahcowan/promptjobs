@@ -140,18 +140,19 @@ pjtest_color_prompt()
 {
     PJOBS_BASE_TPUT='sgr0; setaf 4'   # signal prompt-jobs to use normal
                                       # intensity for base color.
+    PJOBS_SEP_TPUT='sgr0; setaf 5'    # to distinguish from the base color.
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
     # TODO: make this test consider non-bash shells.
     BSQ='\[[0;10m[34m\]'
+    SSQ='\[[0;10m[35m\]'
     NSQ='\[[1m[31m\]'
     JSQ='\[[1m[33m\]'
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
-pjtest_special_chars()
-{
+pjtest_special_chars() {
     # Ensure that we use basenames, and don't allow escapes in the
     # output. TODO: zsh uses % for escapes, rather than backslash.
     PJTEST_PROMPT="$(get_prompt '$ ' dumb '/bin/echo' '\\ls')"
