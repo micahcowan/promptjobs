@@ -115,18 +115,12 @@ pjobs_gen_prompt()
     printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}"
 }
 
-# Generate an escape sequence that will set a color/bold combo, given a
-# color number and bold (as boolean).
+# Generate an escape sequence from a semicolon-separated list of tput
+# arguments.
 pjobs_gen_seq()
 {
     printf '%s' "$PJOBS_SEQ_PROTECT_START"
-    if [ "$2" -eq 1 ]
-    then
-        "$PJOBS_TPUT_PATH" bold
-    else
-        "$PJOBS_TPUT_PATH" sgr0
-    fi
-    "$PJOBS_TPUT_PATH" setaf "$1"
+    printf '%s' "$1" | awk -v RS=';' '{ system("tput " $0) }'
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
 
@@ -207,25 +201,19 @@ then
     
     if [ "$(id -u)" -ne 0 ]
     then
-        : ${PJOBS_BASE_COLOR:=4}    # blue
-        : ${PJOBS_BASE_BOLD:=1}     # bright
-        : ${PJOBS_NUM_COLOR:=1}     # red
-        : ${PJOBS_NUM_BOLD:=1}      # bright
+        : ${PJOBS_BASE_TPUT:='bold; setaf 4'} # bright blue
+        : ${PJOBS_NUM_TPUT:='bold; setaf 1'} # bright red
     else
-        : ${PJOBS_BASE_COLOR:=1}    # red
-        : ${PJOBS_BASE_BOLD:=0}     # normal
-        : ${PJOBS_NUM_COLOR:=2}     # green
-        : ${PJOBS_NUM_BOLD:=0}      # normal
+        : ${PJOBS_BASE_TPUT:='sgr0; setaf 1'} # red
+        : ${PJOBS_NUM_TPUT:='sgr0; setaf 2'} # green
     fi
-    : ${PJOBS_JOB_COLOR:=3}     # yellow
-    : ${PJOBS_JOB_BOLD:=1}      # bright
-    : ${PJOBS_SEP_COLOR:="$PJOBS_BASE_COLOR"}
-    : ${PJOBS_SEP_BOLD:="$PJOBS_BASE_BOLD"}
+    : ${PJOBS_JOB_TPUT:='bold; setaf 3'} # bright yellow
+    : ${PJOBS_SEP_TPUT:="$PJOBS_BASE_TPUT"}
 
     # Generate coloring sequences: $PJOBS_BASE_SEQ, $PJOBS_NUM_SEQ, etc.
     for x in BASE NUM JOB SEP
     do
-        eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "$'"PJOBS_${x}_COLOR"'" "$'"PJOBS_${x}_BOLD"'")'
+        eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "$'"PJOBS_${x}_TPUT"'")'
     done
 
     PJOBS_CLEAR_SEQ="${PJOBS_SEQ_PROTECT_START}$("$PJOBS_TPUT_PATH" sgr0)${PJOBS_SEQ_PROTECT_END}"

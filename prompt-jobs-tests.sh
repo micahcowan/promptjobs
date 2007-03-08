@@ -138,8 +138,8 @@ pjtest_nocolor_prompt()
 
 pjtest_color_prompt()
 {
-    PJOBS_BASE_BOLD=0   # signal prompt-jobs to use normal intensity for base
-                        # color.
+    PJOBS_BASE_TPUT='sgr0; setaf 4'   # signal prompt-jobs to use normal
+                                      # intensity for base color.
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
     # TODO: make this test consider non-bash shells.
     BSQ='\[[0;10m[34m\]'
