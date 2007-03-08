@@ -24,20 +24,13 @@ configuration editor, allowing the user to tweak various settings, and
 providing the option to save them persistently. Upon completion, these settings
 should take effect immediately in the current shell instance.
 
-A user has changed the prompt-jobs settings from their defaults in one shell,
-and wishes for them to be reflected in the current shell. The prompt command
-should automatically detect such changes, and update the prompt accordingly.
-
-Due to the required disk accesses involved, the user does not wish the prompt
-command to automatically detect changes in the default settings. Using the
-prompt-jobs-config script, the user should be able to turn off such automatic
-checks.
+A user has changed the prompt-jobs settings from their defaults in one
+shell, and wishes for them to be reflected in another shell. A
+straightforward mechanism should be provided that allows the current
+shell to use the updated settings.
 
 A user wishes to restore his prompt to what it was before the prompt-jobs
 script was run. The user should be able to invoke a command that does this.
-
-Rather than include job information in the prompt proper, the user wishes to
-display job information on a status line.
 
 A user wishes jobs that start with a common word, such as "vim" or "pico", to
 be listed by the /argument/ to that command, rather than the command name
@@ -65,9 +58,13 @@ Zsh requires the following options to be set/unset in order to work:
   unsetopt function_argzero
 
 ksh88 may not support command substitution... perhaps a workaround can be made
-to work /within/ parameter expansion?
+to work /within/ parameter expansion? (No such problem with pdksh.)
 
-Apparently, some terminal types have "status lines". Consider using status
-lines for the job lists when they are available.
+TODO
 
-Consider supporting fallback on setf if setaf is unavailable.
+Support non-bash shells.
+
+Create configuring script.
+
+Support special recognition of some commands, like sudo ("alert" jobs),
+or editor commands ("alternate-color" jobs).
