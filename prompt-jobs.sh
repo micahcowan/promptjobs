@@ -25,6 +25,25 @@
 # modifications, is permitted, provided that the above copyright is
 # retained in distributions of this program in source form.
 
+### Preliminary Initialization
+
+# What shell is this?
+PJOBS_BASH=
+PJOBS_DASH=
+PJOBS_PDKSH=
+PJOBS_KSH93=
+PJOBS_ZSH=
+
+if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
+elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
+fi
+
+# Make sure we use prompt substitution in zsh
+if [ "$PJOBS_ZSH" ]
+then
+    setopt prompt_subst prompt_percent
+fi
+
 ### Utility functions
 
 pjobs_warn()
@@ -145,24 +164,40 @@ pjobs_get_list_loc()
 '
 }
 
-### Try to detect our environment
-
-# What shell is this?
-PJOBS_BASH=
-PJOBS_DASH=
-PJOBS_PDKSH=
-PJOBS_KSH93=
-PJOBS_ZSH=
-
-if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
-elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
-fi
-
-# Make sure we use prompt substitution in zsh
 if [ "$PJOBS_ZSH" ]
 then
-    setopt prompt_subst prompt_percent
+    # We'll write our own version of the "jobs" command, since zsh's is
+    # a nonstandard output format. Producing this intermediate format is
+    # less efficient than simply using $jobstates, $jobtexts directly to
+    # produce the prompt, but it allows us to easily reuse the logic that's
+    # already in pjobs_gen_joblist().
+    # 
+    # We'll put it in a var, though, instead of standard output, so we
+    # can run it in the current shell and access the value easily from
+    # another.
+    pjobs_jobs()
+    {
+        PJOBS_JOBS=""
+        for i in ${(k)jobstates}
+        do
+            if [ "${"${jobstates[$i]}"%%:*}" = "suspended" ]
+            then
+                PJOBS_JOBS_NEW="[$i]   Stopped ${jobtexts[$i]}"
+                PJOBS_JOBS_OLD="$PJOBS_JOBS"
+                PJOBS_JOBS="$(printf '%s\n%s' "$PJOBS_JOBS_OLD" "$PJOBS_JOBS_NEW")"
+            fi
+        done
+    }
+
+    # Here's our pre-prompt hook.
+    precmd()
+    {
+        pjobs_jobs
+        PS1="$(printf '%s' "$PJOBS_JOBS" | pjobs_gen_prompt)"
+    }
 fi
+
+### Try to detect our environment
 
 #   Was this script executed?
 if [ "$(basename -- "$0")" = prompt-jobs.sh ]
