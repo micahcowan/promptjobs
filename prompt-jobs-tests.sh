@@ -32,6 +32,7 @@ then
         special_chars
         prompt_split
         root_colors
+        zsh_jobs
     "
     if false    # set this to true to disable shell-specific tests.
     then
@@ -39,9 +40,12 @@ then
     elif [ "$BASH_VERSION" ]
     then
         PJTEST_TESTS="$PJTEST_TESTS bash"
-    elif [ "$ZSH_VERSION" ]
-    then
-        PJTEST_TESTS="$PJTEST_TESTS zsh"
+    else
+        PJTEST_TESTS="$PJTEST_TESTS ps1"
+        if [ "$ZSH_VERSION" ]
+        then
+            PJTEST_TESTS="$PJTEST_TESTS zsh"
+        fi
     fi
 fi
 
@@ -210,6 +214,14 @@ pjtest_root_colors()
                         "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
+pjtest_ps1()
+{
+    # In shells other than bash, prompt-jobs.sh should set PS1 with a
+    # command susbitution.
+    PJTEST_RESULT="$( . ./prompt-jobs.sh; echo "$PS1" )"
+    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm '$(jobs | pjobs_gen_prompt)')" ]
+}
+
 pjtest_bash()
 {
     # Ensure we use the proper escape-sequence protection for bash.
@@ -225,7 +237,7 @@ pjtest_bash()
 
     # prompt-jobs.sh should set PROMPT_COMMAND for bash. It should also
     # preserve previous contents of PROMPT_COMMAND.
-    PJTEST_RESULT=$( PROMPT_COMMAND='true'; . ./prompt-jobs.sh; echo "$PROMPT_COMMAND" )
+    PJTEST_RESULT="$( PROMPT_COMMAND='true'; . ./prompt-jobs.sh; echo "$PROMPT_COMMAND" )"
     assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(jobs | pjobs_gen_prompt)"')" ]
 }
 
@@ -241,6 +253,20 @@ pjtest_zsh()
     CSQ='%{[0;10m%}'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+}
+
+pjtest_zsh_jobs()
+{
+    # Ensure that prompt-jobs.sh knows how to process zsh's funky jobs
+    # format.
+    PJTEST_PROMPT="$( TERM=dumb; PS1='$ '; . ./prompt-jobs.sh; pjobs_gen_prompt <<EOF 
+[1]  - suspended  man zsh
+[2]  + done       ls | 
+       suspended  less
+EOF
+)"
+
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:man|2:ls)$ ')" ]
 }
 
 ### Run tests

@@ -56,6 +56,8 @@ work-around using PROMPT_JOBS.
 ksh88 may not support command substitution... perhaps a workaround can be made
 to work /within/ parameter expansion? (No such problem with pdksh.)
 
+Zsh's "jobs" within PS1 gives empty (contrary to POSIX).
+
 TODO
 
 Not having tput should just disable terminal codes, rather than killing
