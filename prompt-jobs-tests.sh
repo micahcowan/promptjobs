@@ -146,7 +146,7 @@ pjtest_color_prompt()
     JSQ='\[[1m[33m\]'
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
 pjtest_special_chars()
