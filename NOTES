@@ -56,7 +56,11 @@ work-around using PROMPT_JOBS.
 ksh88 may not support command substitution... perhaps a workaround can be made
 to work /within/ parameter expansion? (No such problem with pdksh.)
 
-Zsh's "jobs" within PS1 gives empty (contrary to POSIX).
+Zsh's "jobs" within PS1 gives empty (contrary to POSIX), so AFAICT can't
+work with prompt-jobs :(.
+
+Unlike ksh93, pdksh can't handle the terminal codes; it and ksh88 need a
+special and clunky escapement, which possibly doesn't even work.
 
 TODO
 
