@@ -185,15 +185,17 @@ fi
 
 #   Do we have color?
 
-"$PJOBS_TPUT_PATH" setaf 1 >/dev/null
-if [ "$PJOBS_HAVE_COLOR" != y ]
+if [ "$PJOBS_HAVE_COLOR" -a "$PJOBS_HAVE_COLOR" != y ]
 then
     : # User has specified that they don't want color.
-elif [ $? -eq 0 ]
-then
-    PJOBS_HAVE_COLOR=y
 else
-    PJOBS_HAVE_COLOR=n
+    "$PJOBS_TPUT_PATH" setaf 1 >/dev/null
+    if [ $? -eq 0 ]
+    then
+        PJOBS_HAVE_COLOR=y
+    else
+        PJOBS_HAVE_COLOR=n
+    fi
 fi
 
 if [ "$PJOBS_HAVE_COLOR" = y ]
@@ -203,10 +205,18 @@ then
     PJOBS_SEQ_PROTECT_START='\['
     PJOBS_SEQ_PROTECT_END='\]'
     
-    : ${PJOBS_BASE_COLOR:=4}    # blue
-    : ${PJOBS_BASE_BOLD:=1}     # bright
-    : ${PJOBS_NUM_COLOR:=1}     # red
-    : ${PJOBS_NUM_BOLD:=1}      # bright
+    if [ "$(id -u)" -ne 0 ]
+    then
+        : ${PJOBS_BASE_COLOR:=4}    # blue
+        : ${PJOBS_BASE_BOLD:=1}     # bright
+        : ${PJOBS_NUM_COLOR:=1}     # red
+        : ${PJOBS_NUM_BOLD:=1}      # bright
+    else
+        : ${PJOBS_BASE_COLOR:=1}    # red
+        : ${PJOBS_BASE_BOLD:=0}     # normal
+        : ${PJOBS_NUM_COLOR:=2}     # green
+        : ${PJOBS_NUM_BOLD:=0}      # normal
+    fi
     : ${PJOBS_JOB_COLOR:=3}     # yellow
     : ${PJOBS_JOB_BOLD:=1}      # bright
     : ${PJOBS_SEP_COLOR:="$PJOBS_BASE_COLOR"}

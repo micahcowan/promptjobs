@@ -31,6 +31,7 @@ then
         color_prompt
         special_chars
         prompt_split
+        root_colors
     "
 fi
 
@@ -166,12 +167,28 @@ pjtest_prompt_split()
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)$')" ]
     PJTEST_PROMPT="$(get_prompt 'micah\$ ' dumb ls)" # With escape character
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)\$ ')" ]
-    PJTEST_PROMPT="$(get_prompt 'micah%$ ' dumb ls)" # With zsh character
+    PJTEST_PROMPT="$(get_prompt 'micah%$ ' dumb ls)" # With zsh escape character
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)%$ ')" ]
     PJTEST_PROMPT="$(get_prompt 'micah% ' dumb ls)" # With csh-style prompt
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)% ')" ]
     PJTEST_PROMPT="$(get_prompt 'root# ' dumb ls)" # With root-style prompt
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'root(1:ls)# ')" ]
+}
+
+pjtest_root_colors()
+{
+    # Make sure we get the stronger default colors as an "I'm in
+    # root-mode" alert.
+    PATH="./bin-fake-id:$PATH"   # Fake "id" command.
+
+    PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+    # TODO: make this test consider non-bash shells.
+    BSQ='\[[0;10m[31m\]'
+    NSQ='\[[0;10m[32m\]'
+    JSQ='\[[1m[33m\]'
+    CSQ='\[[0;10m\]'
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
+                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
 ### Run tests
