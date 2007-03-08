@@ -110,8 +110,9 @@ END {
 
 pjobs_gen_prompt()
 {
+    printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_BEFORE_LIST}"
     pjobs_gen_joblist
-    printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_ORIG_PS1}${PJOBS_CLEAR_SEQ}"
+    printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}"
 }
 
 # Generate an escape sequence that will set a color/bold combo, given a
@@ -127,6 +128,26 @@ pjobs_gen_seq()
     fi
     "$PJOBS_TPUT_PATH" setaf "$1"
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
+}
+
+# Find where to put the jobs list. First arg should be 'pre' or 'post',
+# second should be original prompt.
+pjobs_get_list_loc()
+{
+    echo "$2" | "$PJOBS_AWK_PATH" -v PREPOST="$1" '
+        BEGIN { buffer="" }
+        { buffer = buffer $0 "\n" }
+        END {
+            if ( match(buffer, "[%\\\\]?[%$#][[:space:]]*$") ) {
+                pre = substr(buffer,1,RSTART-1);
+                post = substr(buffer,RSTART,RLENGTH);
+            } else {
+                pre = "";
+                post = buffer;
+            }
+            printf("%s", PREPOST == "pre" ? pre : post);
+        }
+'
 }
 
 ### Try to detect our environment
@@ -203,6 +224,8 @@ fi
 : ${PJOBS_ORIG_PS1:="$PS1"}
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
+: ${PJOBS_BEFORE_LIST:="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
+: ${PJOBS_AFTER_LIST:="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"}
 
 # Define PJOBS_MID_LIST_STR; default differs depending on whether we have
 # color.
