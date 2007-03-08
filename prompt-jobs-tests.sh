@@ -30,6 +30,7 @@ then
         nocolor_prompt
         color_prompt
         special_chars
+        prompt_split
     "
 fi
 
@@ -154,6 +155,23 @@ pjtest_special_chars()
     # output. TODO: zsh uses % for escapes, rather than backslash.
     PJTEST_PROMPT="$(get_prompt '$ ' dumb '/bin/echo' '\\ls')"
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:echo 2:ls)$ ')" ]
+}
+
+pjtest_prompt_split()
+{
+    # Make sure we put the joblist right before any final $, %, #.
+    PJTEST_PROMPT="$(get_prompt 'micah$ ' dumb ls)"
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)$ ')" ]
+    PJTEST_PROMPT="$(get_prompt 'micah$' dumb ls)" # w/o space
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)$')" ]
+    PJTEST_PROMPT="$(get_prompt 'micah\$ ' dumb ls)" # With escape character
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)\$ ')" ]
+    PJTEST_PROMPT="$(get_prompt 'micah%$ ' dumb ls)" # With zsh character
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)%$ ')" ]
+    PJTEST_PROMPT="$(get_prompt 'micah% ' dumb ls)" # With csh-style prompt
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'micah(1:ls)% ')" ]
+    PJTEST_PROMPT="$(get_prompt 'root# ' dumb ls)" # With root-style prompt
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm 'root(1:ls)# ')" ]
 }
 
 ### Run tests
