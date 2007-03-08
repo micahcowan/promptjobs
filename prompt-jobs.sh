@@ -282,9 +282,15 @@ fi
 unset pjobs_warn
 unset PJOBS_FORMAT
 
-# XXX: bash-only:
-PROMPT_COMMAND='PS1="$(jobs | pjobs_gen_prompt)"'
-if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
+PS1='$(jobs | pjobs_gen_prompt)'
+# The above line isn't sufficient for bash, because bash does it's
+# prompt escape processing before it does command substitution. We'll
+# use PROMPT_COMMAND to get the job done.
+if [ "$PJOBS_BASH" ]
 then
-    PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
+    PROMPT_COMMAND="PS1=\"$PS1\""
+    if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
+    then
+        PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
+    fi
 fi
