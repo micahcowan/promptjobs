@@ -47,8 +47,9 @@ pjobs_gen_joblist()
         -v PJOBS_IN_JOBS_STR="$(pjobs_esc "$PJOBS_IN_JOBS_STR")" \
         -v PJOBS_POST_LIST_STR="$(pjobs_esc "$PJOBS_POST_LIST_STR")" \
         -v PJOBS_CLEAR_SEQ="$(pjobs_esc "$PJOBS_CLEAR_SEQ")" \
-        -v PJOBS_BASE_SEQ="$(pjobs_esc "$PJOBS_BASE_SEQ")" -v PJOBS_NUM_SEQ="$(pjobs_esc "$PJOBS_NUM_SEQ")" \
-        -v PJOBS_JOB_SEQ="$(pjobs_esc "$PJOBS_JOB_SEQ")" -v PJOBS_SEP_SEQ="$(pjobs_esc "$PJOBS_SEP_SEQ")" \
+        -v PJOBS_NUM_SEQ="$(pjobs_esc "$PJOBS_NUM_SEQ")" \
+        -v PJOBS_JOB_SEQ="$(pjobs_esc "$PJOBS_JOB_SEQ")" \
+        -v PJOBS_SEP_SEQ="$(pjobs_esc "$PJOBS_SEP_SEQ")" \
         -v PJOBS_ESCAPE_CHAR='\\' \
         '
 BEGIN {
@@ -102,7 +103,7 @@ BEGIN {
 
 END {
     if (started) {
-        printf("%s", PJOBS_BASE_SEQ PJOBS_POST_LIST_STR PJOBS_CLEAR_SEQ);
+        printf("%s", PJOBS_SEP_SEQ PJOBS_POST_LIST_STR PJOBS_CLEAR_SEQ);
     }
 }
 '
