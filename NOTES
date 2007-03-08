@@ -62,6 +62,9 @@ to work /within/ parameter expansion? (No such problem with pdksh.)
 
 TODO
 
+Not having tput should just disable terminal codes, rather than killing
+prompt-jobs.
+
 Support non-bash shells.
 
 Create configuring script.
