@@ -147,16 +147,32 @@ pjobs_get_list_loc()
 
 ### Try to detect our environment
 
+# What shell is this?
+PJOBS_BASH=
+PJOBS_DASH=
+PJOBS_PDKSH=
+PJOBS_KSH93=
+PJOBS_ZSH=
+
+if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
+elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
+fi
+
+# Make sure we use prompt substitution in zsh
+if [ "$PJOBS_ZSH" ]
+then
+    setopt prompt_subst prompt_percent
+fi
+
 #   Was this script executed?
 if [ "$(basename -- "$0")" = prompt-jobs.sh ]
 then
-    pjobs_warn "ERROR: This script should not be executed directly. Source it instead."
-    if [ "$ZSH_NAME" ]
+    if [ ! "$PJOBS_ZSH" ] || ( setopt | grep '^nofunctionargzero$' 2>&1 )
     then
-        pjobs_warn "Please run 'unsetopt Function_ArgZero' in zsh before sourcing this script."
-        return 1
-    else
+        pjobs_warn "ERROR: This script should not be executed directly. Source it instead."
         exit 1
+    # else: assume it's fine, since zsh sets argzero for inclusions by
+    # default.
     fi
 fi
 
@@ -197,8 +213,15 @@ if [ "$PJOBS_HAVE_COLOR" = y ]
 then
     # Figure out terminal-protecting sequences.
     # XXX: currently bash-specific.
-    PJOBS_SEQ_PROTECT_START='\['
-    PJOBS_SEQ_PROTECT_END='\]'
+    if [ "$PJOBS_BASH" ]
+    then
+        PJOBS_SEQ_PROTECT_START='\['
+        PJOBS_SEQ_PROTECT_END='\]'
+    elif [ "$PJOBS_ZSH" ]
+    then
+        PJOBS_SEQ_PROTECT_START='%{'
+        PJOBS_SEQ_PROTECT_END='%}'
+    fi
     
     if [ "$(id -u)" -ne 0 ]
     then
