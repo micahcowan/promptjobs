@@ -33,10 +33,20 @@ then
         prompt_split
         root_colors
     "
+    if true
+    then
+        :
+    elif [ "$BASH_VERSION" ]
+    then
+        PJTEST_TESTS="$PJTEST_TESTS bash"
+    elif [ "$ZSH_VERSION" ]
+    then
+        PJTEST_TESTS="$PJTEST_TESTS zsh"
+    fi
 fi
 
 #   Zsh needs some tweaks.
-if [ "$ZSH_NAME" ]
+if [ "$ZSH_VERSION" ]
 then
     set -y
     unsetopt Function_ArgZero
@@ -142,12 +152,17 @@ pjtest_color_prompt()
                                       # intensity for base color.
     PJOBS_SEP_TPUT='sgr0; setaf 5'    # to distinguish from the base color.
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+
+    # Remove any escape-protections for the purpose of this test
+    # (they'll be dealt with in the shell-specific tests).
+    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
+
     # TODO: make this test consider non-bash shells.
-    BSQ='\[[0;10m[34m\]'
-    SSQ='\[[0;10m[35m\]'
-    NSQ='\[[1m[31m\]'
-    JSQ='\[[1m[33m\]'
-    CSQ='\[[0;10m\]'
+    BSQ='[0;10m[34m'
+    SSQ='[0;10m[35m'
+    NSQ='[1m[31m'
+    JSQ='[1m[33m'
+    CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
@@ -183,13 +198,35 @@ pjtest_root_colors()
     PATH="./bin-fake-id:$PATH"   # Fake "id" command.
 
     PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+
+    # Remove any escape-protections for the purpose of this test
+    # (they'll be dealt with in the shell-specific tests).
+    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
+
     # TODO: make this test consider non-bash shells.
-    BSQ='\[[0;10m[31m\]'
-    NSQ='\[[0;10m[32m\]'
+    BSQ='[0;10m[31m'
+    NSQ='[0;10m[32m'
+    JSQ='[1m[33m'
+    CSQ='[0;10m'
+    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
+                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+}
+
+pjtest_bash()
+{
+    # Ensure we use the proper escape-sequence protection for bash.
+    PJOBS_BASE_TPUT='sgr0; setaf 4'   # signal prompt-jobs to use normal
+                                      # intensity for base color.
+    PJOBS_SEP_TPUT='sgr0; setaf 5'    # to distinguish from the base color.
+    PJTEST_PROMPT=$(get_prompt '$ ' ansi cat 'ls | less')
+    # TODO: make this test consider non-bash shells.
+    BSQ='\[[0;10m[34m\]'
+    SSQ='\[[0;10m[35m\]'
+    NSQ='\[[1m[31m\]'
     JSQ='\[[1m[33m\]'
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
 }
 
 ### Run tests
