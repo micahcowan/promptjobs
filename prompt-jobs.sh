@@ -186,7 +186,10 @@ fi
 #   Do we have color?
 
 "$PJOBS_TPUT_PATH" setaf 1 >/dev/null
-if [ $? -eq 0 ]
+if [ "$PJOBS_HAVE_COLOR" != y ]
+then
+    : # User has specified that they don't want color.
+elif [ $? -eq 0 ]
 then
     PJOBS_HAVE_COLOR=y
 else
