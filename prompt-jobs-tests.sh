@@ -40,12 +40,9 @@ then
     elif [ "$BASH_VERSION" ]
     then
         PJTEST_TESTS="$PJTEST_TESTS bash"
-    else
-        PJTEST_TESTS="$PJTEST_TESTS ps1"
-        if [ "$ZSH_VERSION" ]
-        then
-            PJTEST_TESTS="$PJTEST_TESTS zsh"
-        fi
+    elif [ "$ZSH_VERSION" ]
+    then
+        PJTEST_TESTS="$PJTEST_TESTS zsh"
     fi
 fi
 
