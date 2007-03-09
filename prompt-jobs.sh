@@ -182,9 +182,9 @@ then
         do
             if [ "${"${jobstates[$i]}"%%:*}" = "suspended" ]
             then
-                PJOBS_JOBS_NEW="[$i]   Stopped ${jobtexts[$i]}"
-                PJOBS_JOBS_OLD="$PJOBS_JOBS"
-                PJOBS_JOBS="$(printf '%s\n%s' "$PJOBS_JOBS_OLD" "$PJOBS_JOBS_NEW")"
+                # Note trailing newline
+                PJOBS_JOBS="${PJOBS_JOBS}[$i]   Stopped ${jobtexts[$i]}
+"
             fi
         done
     }
