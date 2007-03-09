@@ -177,6 +177,7 @@ then
     # another.
     pjobs_jobs()
     {
+        eval '
         PJOBS_JOBS=""
         for i in ${(k)jobstates}
         do
@@ -186,7 +187,7 @@ then
                 PJOBS_JOBS="${PJOBS_JOBS}[$i]   Stopped ${jobtexts[$i]}
 "
             fi
-        done
+        done'
     }
 
     # Here's our pre-prompt hook.
