@@ -32,7 +32,6 @@ then
         special_chars
         prompt_split
         root_colors
-        zsh_jobs
     "
     if false    # set this to true to disable shell-specific tests.
     then
@@ -250,20 +249,6 @@ pjtest_zsh()
     CSQ='%{[0;10m%}'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
-}
-
-pjtest_zsh_jobs()
-{
-    # Ensure that prompt-jobs.sh knows how to process zsh's funky jobs
-    # format.
-    PJTEST_PROMPT="$( TERM=dumb; PS1='$ '; . ./prompt-jobs.sh; pjobs_gen_prompt <<EOF 
-[1]  - suspended  man zsh
-[2]  + done       ls | 
-       suspended  less
-EOF
-)"
-
-    assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = "$(qm '(1:man|2:ls)$ ')" ]
 }
 
 ### Run tests
