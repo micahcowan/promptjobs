@@ -46,20 +46,18 @@ DEVELOPMENT NOTES
 Idioms for protecting escape sequences:
     bash:   '\[...\]'
     zsh:    '%{...%}'
-    ksh:    (unnecessary: smart counting)
+    ksh:    '^O^M^O...^O', where '^O' is any non-printing character.
 
-In bash, hese protection escapes can /not/ come from an expansion, but
-must exist literally within PS1. Not a problem for ksh, which doesn't
-use these. Zsh will interpret these after interpolation. Bash can
-work-around using PROMPT_JOBS.
+In bash, these protection escapes can /not/ come from an expansion, but
+must exist literally within PS1. Not a problem for ksh or zsh, which
+will interpret these after interpolation. Bash can work-around using
+PROMPT_JOBS.
 
-ksh88 may not support command substitution... perhaps a workaround can be made
-to work /within/ parameter expansion? (No such problem with pdksh.)
+Ksh88 may not support command substitution... perhaps a workaround can
+be made to work /within/ parameter expansion? (No such problem with
+pdksh, nor ksh93.)
 
-Zsh's "jobs" within PS1 gives empty (contrary to POSIX), so AFAICT can't
-work with prompt-jobs :(.
-
-ksh can't handle the terminal codes; it needs a special and clunky
+Ksh can't handle the terminal codes; it needs a special and clunky
 escapement, which possibly doesn't even work. UPDATE: a very special
 syntax can be used to accomplish this, but it only works if you can find
 a non-printing character with no visible terminal effects. At the
@@ -69,18 +67,17 @@ a meaning for most terminals, but its meaning is generally to shift into
 the textual codeset (as opposed to graphical).  Still, I should do some
 more research into the advisability of using this.
 
-pdksh doesn't emit POSIX-compliant "jobs" output (splits a pipeline
+Pdksh doesn't emit POSIX-compliant "jobs" output (splits a pipeline
 across lines), and so such things may not show up in the prompt list.
-zsh has the same problem, but doesn't affect the list as I actually use
+Zsh has the same problem, but doesn't affect the list as I actually use
 special shell variables to generate the jobs listing. Hopefully I can
 write a simple workaround into the jobs parsing code to make pdksh work.
 
 TODO
 
 Not having tput should just disable terminal codes, rather than killing
-prompt-jobs.
-
-Support non-bash shells.
+prompt-jobs. Possibly should support direct specification of escape
+sequences.
 
 Create configuring script.
 
