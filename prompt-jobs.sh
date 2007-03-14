@@ -60,6 +60,8 @@ unset PJOBS_ZSH
 
 if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
 elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
+elif [ "$KSH_VERSION" -a "${KSH_VERSION#'@(#)PD KSH'}" != "${KSH_VERSION}" ];
+    then PJOBS_PDKSH=y
 fi
 
 # Make sure we use prompt substitution in zsh
@@ -154,7 +156,7 @@ END {
 
 pjobs_gen_prompt()
 {
-    printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_BEFORE_LIST}"
+    printf '%s' "${PJOBS_KSH_PREFIX}${PJOBS_BASE_SEQ}${PJOBS_BEFORE_LIST}"
     pjobs_gen_joblist
     printf '%s' "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}"
 }
@@ -272,7 +274,7 @@ fi
 if [ "$PJOBS_HAVE_COLOR" = y ]
 then
     # Figure out terminal-protecting sequences.
-    # XXX: currently bash-specific.
+    PJOBS_KSH_PREFIX=''
     if [ "$PJOBS_BASH" ]
     then
         PJOBS_SEQ_PROTECT_START='\['
@@ -281,6 +283,13 @@ then
     then
         PJOBS_SEQ_PROTECT_START='%{'
         PJOBS_SEQ_PROTECT_END='%}'
+    elif [ "$PJOBS_PDKSH" ]
+    then
+        PJOBS_SEQ_PROTECT_START="$(printf '\017')"  # The SHIFT-OUT control.
+        PJOBS_SEQ_PROTECT_END="$(printf '\017')"    # The SHIFT-OUT control.
+        PJOBS_KSH_PREFIX="$(printf '\017\r')"           # Special sequence to define
+                                                    # SHIFT-OUT as the
+                                                    # escape protector.
     fi
     
     if [ "$(id -u)" -ne 0 ]
