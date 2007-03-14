@@ -55,12 +55,19 @@ unset PJOBS_BASH
 unset PJOBS_DASH
 unset PJOBS_PDKSH
 unset PJOBS_KSH93
+unset PJOBS_KSH
 unset PJOBS_ZSH
 
 if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
 elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
-elif [ "$KSH_VERSION" -a "${KSH_VERSION#'@(#)PD KSH'}" != "${KSH_VERSION}" ];
-    then PJOBS_PDKSH=y
+elif [ "$KSH_VERSION" -a "${KSH_VERSION#'@(#)PD KSH'}" != "${KSH_VERSION}" ]
+then
+    PJOBS_PDKSH=y
+    PJOBS_KSH=y
+elif ( [ "${.sh.version}"  ] ) 2>/dev/null  # Non-ksh shells will complain
+then
+    PJOBS_KSH93=y
+    PJOBS_KSH=y
 fi
 
 # Make sure we use prompt substitution in zsh
@@ -282,7 +289,7 @@ then
     then
         PJOBS_SEQ_PROTECT_START='%{'
         PJOBS_SEQ_PROTECT_END='%}'
-    elif [ "$PJOBS_PDKSH" ]
+    elif [ "$PJOBS_KSH" ]
     then
         PJOBS_SEQ_PROTECT_START="$(printf '\017')"  # The SHIFT-OUT control.
         PJOBS_SEQ_PROTECT_END="$(printf '\017')"    # The SHIFT-OUT control.
