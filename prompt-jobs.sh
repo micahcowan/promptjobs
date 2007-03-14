@@ -9,9 +9,25 @@
 # the background), within the prompt itself. It is designed to be safe to use
 # for all terminals, and all Bourne shells that conform to the Single Unix
 # Specification version 3, plus the extended ability to expand command
-# substitutions within the PS1 shell variable (which is not required by SUSv3).
-# This includes bash, zsh, ash, dash, and ksh (public domain and '93, but /not/
-# 88).
+# substitutions within the PS1 shell variable. This script also relies
+# on the shell having some ability to hook a command to be run for each
+# prompt. In bash and zsh, this is accomplished via PROMPT_COMMAND and
+# precmd(), respectively; in some other shells (ksh93 and pdksh), this
+# is done via command substitition on the value of the special PS1
+# variable. My understanding is that ksh88 (as opposed to the clone,
+# pdksh) does not support command substitution, so this code is unlikely
+# to work there.
+#
+# This code will refuse to enable color support if it does not recognize
+# a shell that either provides support for protecting escape sequences
+# (so that the shell isn't confused about the remaining space on a
+# line), or does not require escape sequences (currently, ksh93 does not
+# appear to require them). Color support can be forced (assuming a
+# terminal supported by the "tput" command) by setting:
+#       PJOBS_SEQ_PROTECT_START=''
+#       PJOBS_SEQ_PROTECT_END=''
+# (Or, if the shell does have escape-sequence protection characters, by
+# specifying those in the corresponding values.)
 # 
 # The settings used to create the prompt string may be configured by running or
 # sourcing the prompt-jobs-config.sh script.

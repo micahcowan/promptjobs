@@ -60,7 +60,15 @@ Zsh's "jobs" within PS1 gives empty (contrary to POSIX), so AFAICT can't
 work with prompt-jobs :(.
 
 Unlike ksh93, pdksh can't handle the terminal codes; it and ksh88 need a
-special and clunky escapement, which possibly doesn't even work.
+special and clunky escapement, which possibly doesn't even work. UPDATE:
+a very special syntax can be used to accomplish this, but it only works
+if you can find a non-printing character with no visible terminal
+effects. At the moment, SHIFT-OUT (octal 017) seems to be a suitable
+candidate (most others have visible effects in xterm). The SHIFT-OUT
+control usually has a meaning for most terminals, but its meaning is
+generally to shift into the textual codeset (as opposed to graphical).
+Still, I should do some more research into the advisability of using
+this.
 
 TODO
 
