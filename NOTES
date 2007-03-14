@@ -69,6 +69,12 @@ a meaning for most terminals, but its meaning is generally to shift into
 the textual codeset (as opposed to graphical).  Still, I should do some
 more research into the advisability of using this.
 
+pdksh doesn't emit POSIX-compliant "jobs" output (splits a pipeline
+across lines), and so such things may not show up in the prompt list.
+zsh has the same problem, but doesn't affect the list as I actually use
+special shell variables to generate the jobs listing. Hopefully I can
+write a simple workaround into the jobs parsing code to make pdksh work.
+
 TODO
 
 Not having tput should just disable terminal codes, rather than killing
