@@ -2,7 +2,7 @@
 
 # NOTE: this script is not intended to be executed (e.g., by "sh prompt-jobs.sh");
 # rather, it is intended to be sourced directly into the currently running
-# interactive shell (e.g., by ". prompt-jobs.sh").
+# interactive shell (e.g., by ". ./prompt-jobs.sh").
 # 
 # This script automatically adjusts the shell prompt to include abbreviated
 # information about currently stopped jobs (jobs that have been suspended to
@@ -27,12 +27,20 @@
 
 ### Preliminary Initialization
 
+# Source any user-specific config
+
+: ${PJOBS_CONFIG:=~/.pjobsrc}
+if [ -f "$PJOBS_CONFIG" ]
+then
+    . "$PJOBS_CONFIG"
+fi
+
 # What shell is this?
-PJOBS_BASH=
-PJOBS_DASH=
-PJOBS_PDKSH=
-PJOBS_KSH93=
-PJOBS_ZSH=
+unset PJOBS_BASH
+unset PJOBS_DASH
+unset PJOBS_PDKSH
+unset PJOBS_KSH93
+unset PJOBS_ZSH
 
 if   [ "$BASH_VERSION" ];   then PJOBS_BASH=y
 elif [ "$ZSH_VERSION" ];    then PJOBS_ZSH=y
@@ -261,14 +269,14 @@ then
     
     if [ "$(id -u)" -ne 0 ]
     then
-        : ${PJOBS_BASE_TPUT:='bold; setaf 4'} # bright blue
-        : ${PJOBS_NUM_TPUT:='bold; setaf 1'} # bright red
+        : ${PJOBS_BASE_TPUT='bold; setaf 4'} # bright blue
+        : ${PJOBS_NUM_TPUT='bold; setaf 1'} # bright red
     else
-        : ${PJOBS_BASE_TPUT:='sgr0; setaf 1'} # red
-        : ${PJOBS_NUM_TPUT:='sgr0; setaf 2'} # green
+        : ${PJOBS_BASE_TPUT='sgr0; setaf 1'} # red
+        : ${PJOBS_NUM_TPUT='sgr0; setaf 2'} # green
     fi
-    : ${PJOBS_JOB_TPUT:='bold; setaf 3'} # bright yellow
-    : ${PJOBS_SEP_TPUT:="$PJOBS_BASE_TPUT"}
+    : ${PJOBS_JOB_TPUT='bold; setaf 3'} # bright yellow
+    : ${PJOBS_SEP_TPUT="$PJOBS_BASE_TPUT"}
 
     # Generate coloring sequences: $PJOBS_BASE_SEQ, $PJOBS_NUM_SEQ, etc.
     for x in BASE NUM JOB SEP
@@ -282,12 +290,12 @@ fi
 ### Guess workable defaults for config variables.
 
 #   What is the current value of PS1?
-: ${PJOBS_ORIG_PS1:="$PS1"}
-: ${PJOBS_ORIG_PROMPT_COMMAND:="$PROMPT_COMMAND"}
+: ${PJOBS_ORIG_PS1="$PS1"}
+: ${PJOBS_ORIG_PROMPT_COMMAND="$PROMPT_COMMAND"}
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
-: ${PJOBS_BEFORE_LIST:="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
-: ${PJOBS_AFTER_LIST:="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"}
+: ${PJOBS_BEFORE_LIST="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
+: ${PJOBS_AFTER_LIST="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"}
 
 # Define PJOBS_MID_LIST_STR; default differs depending on whether we have
 # color.
