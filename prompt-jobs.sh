@@ -21,8 +21,7 @@
 # This code will refuse to enable color support if it does not recognize
 # a shell that either provides support for protecting escape sequences
 # (so that the shell isn't confused about the remaining space on a
-# line), or does not require escape sequences (currently, ksh93 does not
-# appear to require them). Color support can be forced (assuming a
+# line). Color support can be forced (assuming a
 # terminal supported by the "tput" command) by setting:
 #       PJOBS_SEQ_PROTECT_START=''
 #       PJOBS_SEQ_PROTECT_END=''
