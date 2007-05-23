@@ -75,6 +75,8 @@ write a simple workaround into the jobs parsing code to make pdksh work.
 
 TODO
 
+Doesn't work when awk == mawk.
+
 Not having tput should just disable terminal codes, rather than killing
 prompt-jobs. Possibly should support direct specification of escape
 sequences.
