@@ -64,7 +64,7 @@ elif [ "$KSH_VERSION" -a "${KSH_VERSION#'@(#)PD KSH'}" != "${KSH_VERSION}" ]
 then
     PJOBS_PDKSH=y
     PJOBS_KSH=y
-elif ( [ "${.sh.version}"  ] ) 2>/dev/null  # Non-ksh shells will complain
+elif ( eval '[ "${.sh.version}"  ]' ) 2>/dev/null  # Non-ksh shells will complain
 then
     PJOBS_KSH93=y
     PJOBS_KSH=y
@@ -207,9 +207,9 @@ then
     # We'll put it in a var, though, instead of standard output, so we
     # can run it in the current shell and access the value easily from
     # another.
+    eval '
     pjobs_jobs()
     {
-        eval '
         PJOBS_JOBS=""
         for i in ${(k)jobstates}
         do
@@ -219,8 +219,8 @@ then
                 PJOBS_JOBS="${PJOBS_JOBS}[$i]   Stopped ${jobtexts[$i]}
 "
             fi
-        done'
-    }
+        done
+    }'
 
     # Here's our pre-prompt hook.
     precmd()
