@@ -105,29 +105,31 @@ pjobs_gen_joblist()
         '
 BEGIN {
     started=0;
+    spc = " \t\f\v";
+    dgt = "0-9";
 }
 
 {
     rol = $0;
 
     # Find job id
-    if (!match(rol, "^[[:space:]]*[[][[:space:]]*[[:digit:]]+[]]([[:space:]]*[+-])?"))
+    if (!match(rol, "^[" spc "]*[[][" spc "]*[" dgt "]+[]]([" spc "]*[+-])?"))
         next;
     
     job_id = substr(rol, 1, RLENGTH);
     rol = substr(rol, 1+RLENGTH);
 
     # Pare job id down to number
-    match(job_id, "[[:digit:]]+");
+    match(job_id, "[" dgt "]+");
     job_id = substr(job_id, RSTART, RLENGTH);
 
     # Find status (and require it to be "Stopped" or "Suspended")
-    if (!match(rol, "^[[:space:]]*([Ss]topped|[Ss]uspended)[[:space:]]*(\\(SIG[^)]+\\))?"))
+    if (!match(rol, "^[" spc "]*([Ss]topped|[Ss]uspended)[" spc "]*(\\(SIG[^)]+\\))?"))
         next;
     rol = substr(rol, 1+RLENGTH);
 
     # Get first word
-    if (!match(rol, "[^[:space:]]+"))
+    if (!match(rol, "[^" spc "]+"))
         next;
     cmdname = substr(rol, RSTART, RLENGTH);
     # Get a basename version
@@ -181,10 +183,10 @@ pjobs_gen_seq()
 pjobs_get_list_loc()
 {
     echo "$2" | "$PJOBS_AWK_PATH" -v PREPOST="$1" '
-        BEGIN { buffer="" }
+        BEGIN { buffer=""; spc=" \t\f\v\n"; }
         { buffer = buffer $0 "\n" }
         END {
-            if ( match(buffer, "[%\\\\]?[%$#][[:space:]]*$") ) {
+            if ( match(buffer, "[%\\\\]?[%$#][" spc "]*$") ) {
                 pre = substr(buffer,1,RSTART-1);
                 post = substr(buffer,RSTART,RLENGTH);
             } else {
