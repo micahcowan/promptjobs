@@ -81,6 +81,13 @@ sequences.
 
 Lack of tput should not, but currently does, result in error message.
 
+If the terminal does not have a definition for argument-taking options,
+such as setaf (such as for "xterm" on OpenBSD), a spurious error is
+emitted.
+
+Should support pdksh-style jobs output, so we can work correctly on
+default setups of OpenBSD, etc.
+
 Create configuring script.
 
 Support special recognition of some commands, like sudo ("alert" jobs),
