@@ -254,20 +254,17 @@ then
     return 127
 fi
 
-#   Do we have tput?
+#   Find tput path.
 : ${PJOBS_TPUT_PATH:="$(command -v tput 2>/dev/null)"}
-if [ ! -x "$PJOBS_TPUT_PATH" ]
-then
-    #   No tput.
-    pjobs_warn "ERROR: Can't find tput! Please make sure that tput is in your path."
-    return 127
-fi
 
 #   Do we have color?
-
 if [ "$PJOBS_HAVE_COLOR" -a "$PJOBS_HAVE_COLOR" != y ]
 then
     : # User has specified that they don't want color.
+elif [ ! -x "$PJOBS_TPUT_PATH" ]
+then
+    #   No tput.
+    PJOBS_HAVE_COLOR=n
 else
     "$PJOBS_TPUT_PATH" setaf 1 >/dev/null 2>&1
     if [ $? -eq 0 ]
