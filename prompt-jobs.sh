@@ -197,6 +197,41 @@ pjobs_get_list_loc()
 '
 }
 
+# Utility for users to undo what promptjobs has done.
+pjobs_remove()
+{
+    # Reset PS1, PROMPT_COMMAND
+    if [ -n "$PJOBS_ORIG_PS1" ]
+    then
+        PS1="$PJOBS_ORIG_PS1"
+    fi
+    if [ -n "$PJOBS_ORIG_PROMPT_COMMAND" ]
+    then
+        PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND"
+    fi
+
+    # Remove variables
+    unset PJOBS_AFTER_LIST PJOBS_AWK_PATH PJOBS_BASE_SEQ PJOBS_BASE_TPUT
+    unset PJOBS_BEFORE_LIST PJOBS_CLEAR_SEQ PJOBS_CONFIG
+    unset PJOBS_HAVE_COLOR PJOBS_IN_JOBS_STR PJOBS_JOB_SEQ PJOBS_JOB_TPUT
+    unset PJOBS_KSH_PREFIX PJOBS_MID_LIST_STR PJOBS_NUM_SEQ PJOBS_NUM_TPUT
+    unset PJOBS_ORIG_PROMPT_COMMAND PJOBS_ORIG_PS1 PJOBS_POST_LIST_STR
+    unset PJOBS_PRE_LIST_STR PJOBS_SEP_SEQ PJOBS_SEP_TPUT
+    unset PJOBS_SEQ_PROTECT_END PJOBS_SEQ_PROTECT_START PJOBS_TPUT_PATH
+    unset PJOBS_FORMAT
+    # Shell indicators
+    unset PJOBS_BASH
+    unset PJOBS_DASH
+    unset PJOBS_PDKSH
+    unset PJOBS_KSH93
+    unset PJOBS_KSH
+    unset PJOBS_ZSH
+
+    # Remove function definitions
+    unset pjobs_esc pjobs_gen_joblist pjobs_gen_prompt pjobs_gen_seq
+    unset pjobs_get_list_loc pjobs_remove
+}
+
 if [ "$PJOBS_ZSH" ]
 then
     # We'll write our own version of the "jobs" command, since zsh's is

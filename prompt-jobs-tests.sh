@@ -31,6 +31,7 @@ then
         special_chars
         prompt_split
         root_colors
+        remove
     "
     if false    # set this to true to disable shell-specific tests.
     then
@@ -199,6 +200,13 @@ pjtest_root_colors()
     CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
                         "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+}
+
+pjtest_remove()
+{
+    # After running pjobs_remove, the namespace should be clean.
+    assert $LINENO [ -z "$( . "$PJOBS_SCRIPT"; unset PJOBS_SCRIPT; pjobs_remove
+                         set | grep -i ^pjobs)" ]
 }
 
 pjtest_ps1()
