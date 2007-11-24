@@ -25,7 +25,6 @@ then
     PJTEST_TESTS="
         execute
         no_awk
-        no_tput
         nocolor_empty_prompt
         nocolor_prompt
         color_prompt
@@ -101,7 +100,8 @@ get_prompt()
         PS1="$NEW_PS1"
         TERM="$NEW_TERM"
         for cmd in "$@"; do echo "$cmd"; done | fake_jobs | \
-            ( . "$PJOBS_SCRIPT" ; pjobs_gen_prompt )
+            ( . "$PJOBS_SCRIPT" ; pjobs_gen_prompt; echo \
+            "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}" )
     )
 }
 
@@ -122,15 +122,6 @@ pjtest_no_awk()
     PJTEST_STATUS=$?
     assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
         grep $(qm "^ERROR: Can't find awk")
-    assert $LINENO [ $PJTEST_STATUS -eq 127 ]
-}
-
-pjtest_no_tput()
-{
-    PJTEST_RESULT="$( set +x; PATH=bin-no-tput . "$PJOBS_SCRIPT" 2>&1)"
-    PJTEST_STATUS=$?
-    assert $LINENO echo $(qm "$PJTEST_RESULT") \| \
-        grep $(qm "^ERROR: Can't find tput")
     assert $LINENO [ $PJTEST_STATUS -eq 127 ]
 }
 
@@ -234,7 +225,7 @@ pjtest_bash()
     # prompt-jobs.sh should set PROMPT_COMMAND for bash. It should also
     # preserve previous contents of PROMPT_COMMAND.
     PJTEST_RESULT="$( PROMPT_COMMAND='true'; . ./prompt-jobs.sh; echo "$PROMPT_COMMAND" )"
-    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(jobs | pjobs_gen_prompt)"')" ]
+    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(jobs | pjobs_gen_prompt)"; PS1="${PS1}${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}"')" ]
 }
 
 pjtest_zsh()
