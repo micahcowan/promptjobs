@@ -230,7 +230,11 @@ pjobs_remove()
     # Remove function definitions
     unset pjobs_esc pjobs_gen_joblist pjobs_gen_prompt pjobs_gen_seq
     unset pjobs_get_list_loc pjobs_remove
+
+    # Remove aliases
+    unalias pjobs-remove
 }
+alias pjobs-remove=pjobs_remove
 
 if [ "$PJOBS_ZSH" ]
 then
