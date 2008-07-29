@@ -201,14 +201,8 @@ pjobs_get_list_loc()
 pjobs_remove()
 {
     # Reset PS1, PROMPT_COMMAND
-    if [ -n "$PJOBS_ORIG_PS1" ]
-    then
-        PS1="$PJOBS_ORIG_PS1"
-    fi
-    if [ -n "$PJOBS_ORIG_PROMPT_COMMAND" ]
-    then
-        PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND"
-    fi
+    PS1="$PJOBS_ORIG_PS1"
+    PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND"
 
     # Remove variables
     unset PJOBS_AFTER_LIST PJOBS_AWK_PATH PJOBS_BASE_SEQ PJOBS_BASE_TPUT
