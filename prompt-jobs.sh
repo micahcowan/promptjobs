@@ -388,13 +388,13 @@ fi
 unset pjobs_warn
 unset PJOBS_FORMAT
 
-PS1='$(jobs | pjobs_gen_prompt)${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}'
+PS1='$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL="$SAVEDLCALL")${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}'
 # The above line isn't sufficient for bash, because bash does it's
 # prompt escape processing before it does command substitution. We'll
 # use PROMPT_COMMAND to get the job done.
 if [ "$PJOBS_BASH" ]
 then
-    PROMPT_COMMAND="PS1=\"\$(jobs | pjobs_gen_prompt)\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""
+    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""
     if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
     then
         PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
