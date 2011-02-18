@@ -394,7 +394,10 @@ PS1='$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_A
 # use PROMPT_COMMAND to get the job done.
 if [ "$PJOBS_BASH" ]
 then
-    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""
+    # The sed command on the end is necessary to work around a bug in
+    # bash that doesn't behave when an escape-protection is immediately
+    # begun after one ends; i.e., the sequence \]\[ occurs.
+    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""'; PS1=$(echo "$PS1" | sed '\''s/\\\]\\\[//g'\'')'
     if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
     then
         PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
