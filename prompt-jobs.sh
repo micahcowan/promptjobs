@@ -173,7 +173,14 @@ pjobs_gen_prompt()
 pjobs_gen_seq()
 {
     printf '%s' "$PJOBS_SEQ_PROTECT_START"
-    printf '%s' "$1" | awk -v RS=';' '{ system("tput " $0) }'
+    if [ "$PJOBS_KSH" ]
+    then
+        # MAKE SURE we don't include the sequence protector in the
+        # sequence itself.
+        printf '%s' "$1" | awk -v RS=';' '{ system("tput " $0) }' | tr -d "$PJOBS_KSH_QUOTECHAR"
+    else
+        printf '%s' "$1" | awk -v RS=';' '{ system("tput " $0) }'
+    fi
     printf '%s' "$PJOBS_SEQ_PROTECT_END"
 }
 
@@ -288,6 +295,7 @@ then
 fi
 
 #   Find tput path.
+# FIXME: This does not get used everywhere we call tput.
 : ${PJOBS_TPUT_PATH:="$(command -v tput 2>/dev/null)"}
 
 #   Do we have color?
@@ -322,11 +330,10 @@ then
         PJOBS_SEQ_PROTECT_END='%}'
     elif [ "$PJOBS_KSH" ]
     then
-        PJOBS_SEQ_PROTECT_START="$(printf '\017')"  # The SHIFT-OUT control.
-        PJOBS_SEQ_PROTECT_END="$(printf '\017')"    # The SHIFT-OUT control.
-        PJOBS_KSH_PREFIX="$(printf '\017\r')"           # Special sequence to define
-                                                    # SHIFT-OUT as the
-                                                    # escape protector.
+        : ${PJOBS_KSH_QUOTECHAR=$(printf '\017')}  # The SHIFT-OUT control.
+        PJOBS_SEQ_PROTECT_START="$PJOBS_KSH_QUOTECHAR"
+        PJOBS_SEQ_PROTECT_END="$PJOBS_KSH_QUOTECHAR"
+        PJOBS_KSH_PREFIX="$(printf '%c\r' "$PJOBS_KSH_QUOTECHAR")"
     fi
     
     if [ "$(id -u)" -ne 0 ]
@@ -346,7 +353,7 @@ then
         eval "PJOBS_${x}_SEQ="'$(pjobs_gen_seq "$'"PJOBS_${x}_TPUT"'")'
     done
 
-    PJOBS_CLEAR_SEQ="${PJOBS_SEQ_PROTECT_START}$("$PJOBS_TPUT_PATH" sgr0)${PJOBS_SEQ_PROTECT_END}"
+    PJOBS_CLEAR_SEQ="$(pjobs_gen_seq sgr0)"
 fi
 
 ### Guess workable defaults for config variables.
@@ -394,10 +401,7 @@ PS1='$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_A
 # use PROMPT_COMMAND to get the job done.
 if [ "$PJOBS_BASH" ]
 then
-    # The sed command on the end is necessary to work around a bug in
-    # bash that doesn't behave when an escape-protection is immediately
-    # begun after one ends; i.e., the sequence \]\[ occurs.
-    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""'; PS1=$(echo "$PS1" | sed '\''s/\\\]\\\[//g'\'')'
+    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""
     if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
     then
         PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
