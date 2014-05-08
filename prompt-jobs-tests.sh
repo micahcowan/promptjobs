@@ -14,6 +14,7 @@
 # Ensure that the terminal escapes will match up exactly, so we can
 # do character-wise comparisons.
 export TERMINFO=./terminfo
+export PJOBS_CONFIG=/dev/null
 
 : ${PJOBS_SCRIPT:=./prompt-jobs.sh}
 : ${PJTEST_SHELL:=${SHELL?:-sh}}
@@ -102,7 +103,7 @@ get_prompt()
         TERM="$NEW_TERM"
         for cmd in "$@"; do echo "$cmd"; done | fake_jobs | \
             ( . "$PJOBS_SCRIPT" ; pjobs_gen_prompt; echo \
-            "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}" )
+            "${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}${PJOBS_AFTER_CLEAR}" )
     )
 }
 
@@ -147,7 +148,7 @@ pjtest_color_prompt()
 
     # Remove any escape-protections for the purpose of this test
     # (they'll be dealt with in the shell-specific tests).
-    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
+    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed -e 's/\\[][]//g' -e 's/%[{}]//g')
 
     BSQ='[0;10m[34m'
     SSQ='[0;10m[35m'
@@ -155,7 +156,7 @@ pjtest_color_prompt()
     JSQ='[1m[33m'
     CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${SSQ}[${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ}]${CSQ}${BSQ}\$${CSQ} ") ]"
 }
 
 pjtest_special_chars() {
@@ -192,14 +193,14 @@ pjtest_root_colors()
 
     # Remove any escape-protections for the purpose of this test
     # (they'll be dealt with in the shell-specific tests).
-    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed 's/\\[][]\|%[{}]//g')
+    PJTEST_PROMPT=$(printf '%s' "$PJTEST_PROMPT" | sed -e 's/\\[][]//g' -e 's/%[{}]//g')
 
     BSQ='[0;10m[31m'
     NSQ='[0;10m[32m'
     JSQ='[1m[33m'
     CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${BSQ}[${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ}]${CSQ}${BSQ}$${CSQ} ") ]"
 }
 
 pjtest_remove()
