@@ -156,7 +156,7 @@ pjtest_color_prompt()
     JSQ='[1m[33m'
     CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${SSQ}[${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ}]${CSQ}${BSQ}\$${CSQ} ") ]"
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}\$${CSQ} ") ]"
 }
 
 pjtest_special_chars() {
@@ -200,7 +200,7 @@ pjtest_root_colors()
     JSQ='[1m[33m'
     CSQ='[0;10m'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${BSQ}[${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ}]${CSQ}${BSQ}$${CSQ} ") ]"
+                        "$(qm "${BSQ}${BSQ}(${NSQ}1${JSQ}cat${BSQ}|${NSQ}2${JSQ}ls${BSQ})${CSQ}${BSQ}\$${CSQ} ") ]"
 }
 
 pjtest_remove()
@@ -229,12 +229,12 @@ pjtest_bash()
     JSQ='\[[1m[33m\]'
     CSQ='\[[0;10m\]'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}\$${CSQ} ") ]"
 
     # prompt-jobs.sh should set PROMPT_COMMAND for bash. It should also
     # preserve previous contents of PROMPT_COMMAND.
     PJTEST_RESULT="$( PROMPT_COMMAND='true'; . ./prompt-jobs.sh; echo "$PROMPT_COMMAND" )"
-    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(jobs | pjobs_gen_prompt)"; PS1="${PS1}${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}"')" ]
+    assert $LINENO [ "$(qm "$PJTEST_RESULT")" = "$(qm 'true; PS1="$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL="$SAVEDLCALL")"; PS1="${PS1}${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}${PJOBS_AFTER_CLEAR}"')" ]
 }
 
 pjtest_zsh()
@@ -248,7 +248,7 @@ pjtest_zsh()
     JSQ='%{[1m[33m%}'
     CSQ='%{[0;10m%}'
     assert $LINENO [ "$(qm "$PJTEST_PROMPT")" = \
-                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}$ ${CSQ}") ]"
+                        "$(qm "${BSQ}${SSQ}(${NSQ}1${JSQ}cat${SSQ}|${NSQ}2${JSQ}ls${SSQ})${CSQ}${BSQ}\$${CSQ} ") ]"
 }
 
 ### Run tests
