@@ -366,6 +366,10 @@ fi
 : ${PJOBS_BEFORE_LIST="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
 : ${PJOBS_AFTER_LIST="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"}
 
+#   Further split trailing whitespace from "post-list"
+PJOBS_AFTER_CLEAR="${PJOBS_AFTER_LIST##*[!	 ]}"
+PJOBS_AFTER_LIST="${PJOBS_AFTER_LIST%"${PJOBS_AFTER_CLEAR}"}"
+
 # Define PJOBS_MID_LIST_STR; default differs depending on whether we have
 # color.
 if [ "$PJOBS_MID_LIST_STR" ]
@@ -395,13 +399,13 @@ fi
 unset pjobs_warn
 unset PJOBS_FORMAT
 
-PS1='$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL="$SAVEDLCALL")${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}'
+PS1='$(SAVEDLCALL=$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL="$SAVEDLCALL")${PJOBS_BASE_SEQ}${PJOBS_AFTER_LIST}${PJOBS_CLEAR_SEQ}${PJOBS_AFTER_CLEAR}'
 # The above line isn't sufficient for bash, because bash does it's
 # prompt escape processing before it does command substitution. We'll
 # use PROMPT_COMMAND to get the job done.
 if [ "$PJOBS_BASH" ]
 then
-    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\""
+    PROMPT_COMMAND="PS1=\"\$(SAVEDLCALL=\$LC_ALL; export LC_ALL=C; jobs | pjobs_gen_prompt; export LC_ALL=\"\$SAVEDLCALL\")\"; PS1=\"\${PS1}\${PJOBS_BASE_SEQ}\${PJOBS_AFTER_LIST}\${PJOBS_CLEAR_SEQ}\${PJOBS_AFTER_CLEAR}\""
     if [ "$PJOBS_ORIG_PROMPT_COMMAND" ]
     then
         PROMPT_COMMAND="$PJOBS_ORIG_PROMPT_COMMAND; $PROMPT_COMMAND"
