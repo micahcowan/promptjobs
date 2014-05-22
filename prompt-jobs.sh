@@ -364,11 +364,13 @@ fi
 : ${PJOBS_PRE_LIST_STR='('}
 : ${PJOBS_POST_LIST_STR=')'}
 : ${PJOBS_BEFORE_LIST="$(pjobs_get_list_loc pre "$PJOBS_ORIG_PS1")"}
-: ${PJOBS_AFTER_LIST="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"}
+if [ "_${PJOBS_AFTER_LIST-_unset__}" = __unset__ ]; then
+    PJOBS_AFTER_LIST="$(pjobs_get_list_loc post "$PJOBS_ORIG_PS1")"
+    # Further split trailing whitespace from "post-list"
+    PJOBS_AFTER_CLEAR="${PJOBS_AFTER_LIST##*[!	 ]}"
+    PJOBS_AFTER_LIST="${PJOBS_AFTER_LIST%"${PJOBS_AFTER_CLEAR}"}"
+fi
 
-#   Further split trailing whitespace from "post-list"
-PJOBS_AFTER_CLEAR="${PJOBS_AFTER_LIST##*[!	 ]}"
-PJOBS_AFTER_LIST="${PJOBS_AFTER_LIST%"${PJOBS_AFTER_CLEAR}"}"
 
 # Define PJOBS_MID_LIST_STR; default differs depending on whether we have
 # color.
