@@ -12,7 +12,7 @@ and transform it like:
 
 (where “man” and “ls” are suspended jobs in the current shell). Except with color, too!
 
-Demonstration video, courtesy of Asciinema (click the image to go to the video's page):
+Demonstration video, courtesy of Asciinema (click the image to go to the video's page - however even the image itself is a decent sample transcript of using promoptjobs):
 
 [![asciicast](https://asciinema.org/a/7410.svg)](https://asciinema.org/a/7410)
 
